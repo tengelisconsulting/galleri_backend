@@ -1,0 +1,41 @@
+version: "3.4"
+services:
+
+  gateway:
+    image: galleri/gateway
+    network_mode: "host"
+    environment:
+      - PGST_HOST
+      - PGST_PORT
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+
+  postgrest:
+    image: tengelisconsulting/postgrest:latest
+    network_mode: "host"
+    environment:
+      # postgrest
+      - PGST_USER
+      - PGST_PASS
+      - PGST_PORT
+      - PGST_SCHEMA
+      - PGST_ANON_ROLE
+      - PGST_POOL
+      - PGST_POOL_TIMEOUT
+      # postgres
+      - PGHOST
+      - PGPORT
+      - PGDB
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+
+
+  db:
+    image: postgres:12.2
+    network_mode: "host"
+    environment:
+      - POSTGRES_USER=${PGUSER}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "${DB_DIRNAME}:/var/lib/postgresql/data"
