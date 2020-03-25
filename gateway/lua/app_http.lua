@@ -6,7 +6,8 @@ local function req(
       port,
       method,
       path,
-      headers
+      headers,
+      body
                   )
    local httpc = http:new()
    httpc:set_timeout(500)
@@ -14,10 +15,8 @@ local function req(
    local res, err = httpc:request({
          method = method,
          path = path,
-         headers = headers
-         -- headers = {
-         --    ["Host"] = "example.com",
-         -- },
+         headers = headers,
+         body = body
    })
    if not res then
       ngx.say("req failed: ", err)
@@ -41,6 +40,9 @@ local function req(
       err = nil,
       body = body
    }
+end
+
+local function proxy_request()
 end
 
 local M = {}

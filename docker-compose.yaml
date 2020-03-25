@@ -2,11 +2,12 @@ version: "3.4"
 services:
 
   gateway:
-    image: galleri/gateway
+    image: galleri/gateway:${GATEWAY_VSN}
     network_mode: "host"
     environment:
       - PGST_HOST
       - PGST_PORT
+      - LUA_CODE_CACHE
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
 
