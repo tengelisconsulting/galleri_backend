@@ -5,21 +5,10 @@ local cjson = require "cjson"
 
 -- public
 local function init_user()
-   ngx.req.read_body()
-   local body = ngx.req.get_body_data()
-   ngx.log(ngx.NOTICE, oldbody)
-   local res = app_http.req(
-      conf.get_pgst_host(),
-      conf.get_pgst_port(),
-      "POST", "/rpc/ac_init_user", {},
-      body
-   )
-   ngx.status = res.status
-   if res.err then
-      ngx.say(res.err)
-      return
-   end
-   ngx.say(res.body)
+   app_http.proxy_pgst({
+         path = "/rpc/ac_init_user",
+         headers = {}
+   })
 end
 
 local function login(username, password)
