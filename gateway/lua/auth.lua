@@ -31,7 +31,7 @@ end
 
 local function respond_new_session(user_id)
    local function fail(status, err_msg)
-      ngx.status = 502
+      ngx.status = status
       local res = cjson.encode({
             err = err_msg
       })
@@ -110,7 +110,7 @@ local function authenticate_username_password()
       ngx.say(cjson.encode("invalid credentials"))
       return
    end
-   respond_new_session(user_id)
+   return respond_new_session(user_id)
 end
 
 -- module
