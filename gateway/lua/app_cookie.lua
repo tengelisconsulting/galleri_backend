@@ -19,6 +19,14 @@ local function set(spec)
 end
 
 
+local function get(key)
+   local function exec(cookie)
+      return cookie:get(key)
+   end
+   return do_work(exec)
+end
+
 local M = {}
 M.set = set
+M.get = get
 return M

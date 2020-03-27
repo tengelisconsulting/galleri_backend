@@ -1,6 +1,7 @@
 import logging
 
 from galleri.token import create_token
+from galleri.token import get_claims
 
 from mg2.framework import req_mapping
 from mg2.app_types import ReqState
@@ -30,8 +31,22 @@ def new_refresh_token(
     user_id = request.read_body(req_state)["user_id"]
     token = create_token(user_id, True)
     logging.debug(
-        "new refrersh token for user id: %s", user_id
+        "new refresh token for user id: %s", user_id
     )
     return response.ok({
         "token": token,
+    })
+
+
+@req_mapping(path="/token/parse", method="POST")
+def parse_token(
+        req_state: ReqState
+)-> ResState:
+    req_body = request.read_body(req_state)
+    claims = get_claims(
+        req_body["token"],
+        req_body["is_refresh"]
+    )
+    return response.ok({
+        "claims": claims
     })

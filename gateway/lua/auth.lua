@@ -4,6 +4,7 @@ local app_cookie = require "lua/app_cookie"
 local app_http = require "lua/app_http"
 local downstream = require "lua/downstream"
 
+local REFRESH_TOKEN_NAME = "galleri_refresh_token"
 
 -- private
 local function get_token(user_id, is_refresh)
@@ -53,7 +54,7 @@ local function respond_new_session(user_id)
    end
 
    local ok, err = app_cookie.set({
-         key = "galleri_refresh_token",
+         key = REFRESH_TOKEN_NAME,
          value = refresh_token,
          path = "/",
          http_only = true,
@@ -113,8 +114,41 @@ local function authenticate_username_password()
    return respond_new_session(user_id)
 end
 
+
+local function renew_session()
+   local refresh_token, err = app_cookie.get(REFRESH_TOKEN_NAME)
+   if not refresh_token then
+      ngx.status = 401
+      local res = cjson.encode({
+            err = "no refresh token"
+      })
+      ngx.say(res)
+   end
+   local session_res = app_http.req_http_zmq({
+         path = "/token/parse",
+         method = "POST",
+         body = cjson.encode({
+               token = refresh_token,
+               is_refresh = true,
+         }),
+   })
+   if session_res.err then
+      ngx.log(ngx.ERR, session_res.err)
+      ngx.status = 401
+      ngx.say(cjson.encode({
+                    err = "invalid refresh token"
+      }))
+      return
+   end
+   -- go on to create new session token...
+   ngx.say(cjson.encode({
+                 status = "ok",
+   }))
+end
+
 -- module
 local M = {}
 M.authenticate_username_password = authenticate_username_password
 M.init_user = init_user
+M.renew_session = renew_session
 return M

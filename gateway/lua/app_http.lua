@@ -13,7 +13,7 @@ local HTTP_ZMQ_PORT = conf.get_http_zmq_port()
 local function req(host, port, spec)
    local httpc = http:new()
    httpc:set_timeout(500)
-   httpc:connect(host, port)
+   local ok, err = httpc:connect(host, port)
    local res, err = httpc:request({
          method = spec.method,
          path = spec.path,

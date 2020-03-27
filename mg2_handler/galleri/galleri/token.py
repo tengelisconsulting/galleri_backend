@@ -9,9 +9,10 @@ from galleri.env import get_env
 
 
 env = get_env()
+PRIV_KEY_FILE = "/app/priv_key"
 
 _token_sig = None
-with open(env.PRIV_KEY_FILE, "r") as f:
+with open(PRIV_KEY_FILE, "r") as f:
     _token_sig = f.read()
 def _get_token_sig()-> str:
     return _token_sig
@@ -29,7 +30,7 @@ def create_token(
     exp_time = (
         datetime.now() + timedelta(seconds=session_timeout_s)
     ).timestamp()
-    return jwt.encode(
+    token_byes = jwt.encode(
         {
             "exp": exp_time,
             # app-defined
@@ -38,15 +39,19 @@ def create_token(
         },
         _get_token_sig(),
         algorithm=_get_algo()
-    ).decode("utf-8")
+    )
+    return token_byes.decode("utf-8")
 
 
-def parse_token(
-        token: str
+def get_claims(
+        token: str,
+        is_refresh: bool
 )-> Dict:
     claims = jwt.decode(
         token,
         _get_token_sig(),
         algorithms=[_get_algo()]
     )
+    if claims["is_refresh"] != is_refresh:
+        raise Exception("bad token type")
     return claims
