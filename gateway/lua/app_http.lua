@@ -20,8 +20,8 @@ local function req(host, port, spec)
          headers = spec.headers,
          body = spec.body
    })
-   if not res then
-      ngx.say("req failed: ", err)
+   if err then
+      ngx.log(ngx.ERR, "req failed: " .. err)
       return {
          status = 502,
          err = err,
@@ -30,7 +30,7 @@ local function req(host, port, spec)
    end
    local body, err = res:read_body()
    if err then
-      ngx.say("failed to read body: ", err)
+      ngx.log(ngx.ERR, "failed to read body: " .. err)
       return {
          status = 502,
          err = err,
@@ -59,7 +59,11 @@ local function proxy_request(host, port, changes)
    local res = req(host, port, req_spec)
    ngx.status = res.status
    if res.err then
-      ngx.say(res.err)
+      ngx.say(
+         cjson.encode({
+               err = res.err
+         })
+      )
       return
    end
    ngx.say(res.body)
