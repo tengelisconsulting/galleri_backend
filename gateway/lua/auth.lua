@@ -1,6 +1,6 @@
 local cjson = require "cjson"
-local ck = require "resty.cookie"
 
+local app_cookie = require "lua/app_cookie"
 local app_http = require "lua/app_http"
 local downstream = require "lua/downstream"
 
@@ -51,13 +51,8 @@ local function respond_new_session(user_id)
       fail(502, "failed to create session")
       return
    end
-   local cookie, err = ck:new()
-   if not cookie then
-      ngx.log(ngx.ERR, err)
-      fail(500, "failed loading cookie mgmt")
-      return
-   end
-   local ok, err = cookie:set({
+
+   local ok, err = app_cookie.set({
          key = "galleri_refresh_token",
          value = refresh_token,
          path = "/",
@@ -65,7 +60,7 @@ local function respond_new_session(user_id)
    })
    if not ok then
       ngx.log(ngx.ERR, err)
-      fail(500, "failed setting cookie")
+      fail(500, "failed creating session")
       return
    end
    local res = cjson.encode({
