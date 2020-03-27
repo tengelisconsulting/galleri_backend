@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+import logging
 from typing import Dict
 
 import jwt
@@ -9,8 +10,11 @@ from galleri.env import get_env
 
 env = get_env()
 
+_token_sig = None
+with open(env.PRIV_KEY_FILE, "r") as f:
+    _token_sig = f.read()
 def _get_token_sig()-> str:
-    return "priv_key"
+    return _token_sig
 
 
 def _get_algo()-> str:
