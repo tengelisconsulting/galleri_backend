@@ -6,39 +6,55 @@ local downstream = require "lua/downstream"
 
 
 -- private
-local function respond_new_session()
+local function get_token(user_id, is_refresh)
+   local function get_path()
+      if is_refresh then
+         return "/token/new/refresh"
+      end
+      return "/token/new/session"
+   end
    local token_req_body = cjson.encode({
-         user_id = "a-user-id"
+         user_id = user_id
    })
-   local session_token_res = app_http.req_http_zmq({
-         path = "/token/new/session",
+   local token_res = app_http.req_http_zmq({
+         path = get_path(),
          method = "POST",
          body = token_req_body,
    })
-   if session_token_res.err then
+   if token_res.err then
+      return nil, "failed to create token"
+   end
+   local token = cjson.decode(token_res.body).token
+   return token, nil
+end
+
+
+local function respond_new_session(user_id)
+   local function fail(status, err_msg)
       ngx.status = 502
-      ngx.say(cjson.encode({
-                    err = "failed to create session"
-      }))
+      local res = cjson.encode({
+            err = err_msg
+      })
+      ngx.say(res)
+   end
+   local session_token, err = get_token(user_id, false)
+   if err then
+      ngx.log(ngx.ERR,
+              "failed to create session token for user id " .. user_id)
+      fail(502, "failed to create session")
       return
    end
-   local refresh_token_res = app_http.req_http_zmq({
-         path = "/token/new/refresh",
-         method = "POST",
-         body = token_req_body,
-   })
-   if refresh_token_res.err then
-      ngx.status = 502
-      ngx.say(cjson.encode({
-                    err = "failed to create session"
-      }))
+   local refresh_token, err_ref = get_token(user_id, true)
+   if err then
+      ngx.log(ngx.ERR,
+              "failed to create refresh token for user id " .. user_id)
+      fail(502, "failed to create session")
       return
    end
-   local session_token = cjson.decode(session_token_res.body).token
-   local refresh_token = cjson.decode(refresh_token_res.body).token
    local cookie, err = ck:new()
    if not cookie then
       ngx.log(ngx.ERR, err)
+      fail(500, "failed loading cookie mgmt")
       return
    end
    local ok, err = cookie:set({
@@ -49,13 +65,13 @@ local function respond_new_session()
    })
    if not ok then
       ngx.log(ngx.ERR, err)
+      fail(500, "failed setting cookie")
       return
    end
-   ngx.say(
-      cjson.encode({
-            session_token = session_token
-      })
-   )
+   local res = cjson.encode({
+         session_token = session_token
+   })
+   ngx.say(res)
 end
 
 -- public
@@ -91,16 +107,15 @@ local function authenticate()
       ngx.say(login_res.err)
       return
    end
-   local uuid = string.gsub(
+   local user_id = string.gsub(
       cjson.decode(login_res.body), "%s", ""
    )
-   if string.len(uuid) == 0 then
+   if string.len(user_id) == 0 then
       ngx.status = 401
       ngx.say(cjson.encode("invalid credentials"))
       return
    end
-   -- generate a jwt...
-   respond_new_session()
+   respond_new_session(user_id)
 end
 
 -- module

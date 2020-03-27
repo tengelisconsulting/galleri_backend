@@ -15,7 +15,6 @@ def create_token(is_refresh: bool)-> str:
 def new_session_token(
         req_state: ReqState
 )-> ResState:
-    logging.info("in here!")
     user_id = request.read_body(req_state)["user_id"]
     token = create_token(False)
     logging.debug(
