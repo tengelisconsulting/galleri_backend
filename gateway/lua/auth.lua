@@ -86,7 +86,7 @@ local function init_user()
    })
 end
 
-local function authenticate()
+local function authenticate_username_password()
    local data = downstream.get_body_table()
    local req_body = cjson.encode({
          p_username = data.username,
@@ -115,6 +115,6 @@ end
 
 -- module
 local M = {}
-M.authenticate = authenticate
+M.authenticate_username_password = authenticate_username_password
 M.init_user = init_user
 return M
