@@ -7,8 +7,35 @@ local downstream = require "lua/downstream"
 
 -- private
 local function respond_new_session()
-   local session_token = "session_token"
-   local refresh_token = "refresh_token"
+   local token_req_body = cjson.encode({
+         user_id = "a-user-id"
+   })
+   local session_token_res = app_http.req_http_zmq({
+         path = "/token/new/session",
+         method = "POST",
+         body = token_req_body,
+   })
+   if session_token_res.err then
+      ngx.status = 502
+      ngx.say(cjson.encode({
+                    err = "failed to create session"
+      }))
+      return
+   end
+   local refresh_token_res = app_http.req_http_zmq({
+         path = "/token/new/refresh",
+         method = "POST",
+         body = token_req_body,
+   })
+   if refresh_token_res.err then
+      ngx.status = 502
+      ngx.say(cjson.encode({
+                    err = "failed to create session"
+      }))
+      return
+   end
+   local session_token = cjson.decode(session_token_res.body).token
+   local refresh_token = cjson.decode(refresh_token_res.body).token
    local cookie, err = ck:new()
    if not cookie then
       ngx.log(ngx.ERR, err)
@@ -24,7 +51,11 @@ local function respond_new_session()
       ngx.log(ngx.ERR, err)
       return
    end
-   ngx.say(session_token)
+   ngx.say(
+      cjson.encode({
+            session_token = session_token
+      })
+   )
 end
 
 -- public

@@ -6,6 +6,8 @@ local conf = require "lua/conf"
 
 local PGST_HOST = conf.get_pgst_host()
 local PGST_PORT = conf.get_pgst_port()
+local HTTP_ZMQ_HOST = conf.get_http_zmq_host()
+local HTTP_ZMQ_PORT = conf.get_http_zmq_port()
 
 
 local function req(host, port, spec)
@@ -42,7 +44,6 @@ local function req(host, port, spec)
    }
 end
 
-
 local function proxy_request(host, port, changes)
    local body = changes.body
    if not body then
@@ -64,18 +65,22 @@ local function proxy_request(host, port, changes)
    ngx.say(res.body)
 end
 
-
 local function req_pgst(spec)
    return req(PGST_HOST, PGST_PORT, spec)
 end
 
+local function req_http_zmq(spec)
+   return req(HTTP_ZMQ_HOST, HTTP_ZMQ_PORT, spec)
+end
 
 local function proxy_pgst(changes)
    proxy_request(PGST_HOST, PGST_PORT, changes)
 end
 
+
 local M = {}
 M.req = req
+M.req_http_zmq = req_http_zmq
 M.req_pgst = req_pgst
 M.proxy_pgst = proxy_pgst
 M.proxy_request = proxy_request
