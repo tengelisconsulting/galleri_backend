@@ -140,10 +140,8 @@ local function renew_session()
       }))
       return
    end
-   -- go on to create new session token...
-   ngx.say(cjson.encode({
-                 status = "ok",
-   }))
+   local claims = cjson.decode(session_res.body).claims
+   return respond_new_session(claims.user_id)
 end
 
 -- module
