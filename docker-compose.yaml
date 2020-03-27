@@ -1,6 +1,16 @@
 version: "3.4"
 services:
 
+  db:
+    image: postgres:12.2
+    network_mode: "host"
+    environment:
+      - POSTGRES_USER=${PGUSER}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "${DB_DIRNAME}:/var/lib/postgresql/data"
+
   gateway:
     image: galleri/gateway:${GATEWAY_VSN}
     network_mode: "host"
@@ -10,6 +20,22 @@ services:
       - LUA_CODE_CACHE
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
+
+  mg2:
+    image: tengelisconsulting/http_zmq:latest
+    network_mode: "host"
+    environment:
+      - PORT=${HTTP_ZMQ_HTTP_PORT}
+      - SEND_PORT=${HTTP_ZMQ_WORK_PORT}
+      - RECV_PORT=${HTTP_ZMQ_RESP_PORT}
+
+  mg2_handler:
+    image: galleri/mg2_handler:${MG2_HANDLER_VSN}
+    network_mode: "host"
+    environment:
+      - MG_HOST=${HTTP_ZMQ_HOST}
+      - MG_WORK_PORT=${HTTP_ZMQ_WORK_PORT}
+      - MG_RESP_PORT=${HTTP_ZMQ_RESP_PORT}
 
   postgrest:
     image: tengelisconsulting/postgrest:latest
@@ -29,14 +55,3 @@ services:
       - PGDB
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
-
-
-  db:
-    image: postgres:12.2
-    network_mode: "host"
-    environment:
-      - POSTGRES_USER=${PGUSER}
-      - POSTGRES_PASSWORD=${PGPASSWORD}
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "${DB_DIRNAME}:/var/lib/postgresql/data"

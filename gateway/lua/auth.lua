@@ -1,8 +1,31 @@
 local cjson = require "cjson"
+local ck = require "resty.cookie"
 
 local app_http = require "lua/app_http"
 local downstream = require "lua/downstream"
 
+
+-- private
+local function respond_new_session()
+   local session_token = "session_token"
+   local refresh_token = "refresh_token"
+   local cookie, err = ck:new()
+   if not cookie then
+      ngx.log(ngx.ERR, err)
+      return
+   end
+   local ok, err = cookie:set({
+         key = "galleri_refresh_token",
+         value = refresh_token,
+         path = "/",
+         http_only = true,
+   })
+   if not ok then
+      ngx.log(ngx.ERR, err)
+      return
+   end
+   ngx.say(session_token)
+end
 
 -- public
 local function init_user()
@@ -46,7 +69,7 @@ local function authenticate()
       return
    end
    -- generate a jwt...
-   ngx.say(login_res.body)
+   respond_new_session()
 end
 
 -- module
