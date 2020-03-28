@@ -10,9 +10,12 @@ local HTTP_ZMQ_HOST = conf.get_http_zmq_host()
 local HTTP_ZMQ_PORT = conf.get_http_zmq_port()
 
 
-local function req(host, port, spec)
+local function req(host, port, spec, timeout)
+   if not timeout then
+      timeout = 500
+   end
    local httpc = http:new()
-   httpc:set_timeout(500)
+   httpc:set_timeout(timeout)
    local ok, err = httpc:connect(host, port)
    local res, err = httpc:request({
          method = spec.method,
