@@ -12,7 +12,7 @@ function cleanup() {
 
 trap cleanup SIGINT
 
-LUA_CODE_CACHE="on" docker-compose -f ${dcp_file} run -d --rm \
+LUA_CODE_CACHE="off" docker-compose -f ${dcp_file} run -d --rm \
               -v ${base_dir}/lua:/app/lua \
               --name backend_gateway_dev \
               gateway

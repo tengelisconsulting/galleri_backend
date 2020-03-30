@@ -16,7 +16,7 @@ services:
     network_mode: "host"
     environment:
       - GATEWAY_PORT
-      - ALLOWED_ORIGINS
+      - ALLOWED_ORIGIN
       - PGST_HOST
       - PGST_PORT
       - LUA_CODE_CACHE
