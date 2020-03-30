@@ -144,9 +144,28 @@ local function renew_session()
    return respond_new_session(claims.user_id)
 end
 
+local function verify_req()
+   -- get user id from token
+   -- local session_res = app_http.req_http_zmq({
+   --       path = "/token/parse",
+   --       method = "POST",
+   --       body = cjson.encode({
+   --             token = refresh_token,
+   --             is_refresh = true,
+   --       }),
+   -- })
+   if not true then
+      ngx.exit(ngx.HTTP_FORBIDDEN)
+      return
+   end
+   -- adds the 'user-id' header as well
+
+end
+
 -- module
 local M = {}
 M.authenticate_username_password = authenticate_username_password
 M.init_user = init_user
 M.renew_session = renew_session
+M.verify_req = verify_req
 return M

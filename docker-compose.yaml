@@ -15,6 +15,8 @@ services:
     image: galleri/gateway:${GATEWAY_VSN}
     network_mode: "host"
     environment:
+      - GATEWAY_PORT
+      - ALLOWED_ORIGINS
       - PGST_HOST
       - PGST_PORT
       - LUA_CODE_CACHE
