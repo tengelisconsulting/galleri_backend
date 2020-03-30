@@ -13,7 +13,7 @@ main() {
 
     cp nginx/nginx.template.conf nginx/nginx.conf
     env_sub GATEWAY_PORT
-    # env_sub ALLOWED_ORIGINS
+    env_sub ALLOWED_ORIGINS
     env_sub PGST_HOST
     env_sub PGST_PORT
     env_sub LUA_CODE_CACHE
