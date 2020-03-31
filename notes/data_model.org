@@ -37,7 +37,7 @@
 
 
 * Collections
-** collection
+** image_collection
 | property      | type      | required? | unique? | key? | ref?         | desc                          |
 |---------------+-----------+-----------+---------+------+--------------+-------------------------------|
 | collection_id | UUID      | Y         | Y       | Y    |              |                               |
@@ -52,10 +52,15 @@
 | created  | TIMESTAMP | Y         |         |      |                 |                          |
 | user_id  | UUID      | Y         |         |      | ac_user.user_id | user that owns the image |
 | href     | TEXT      | Y         |         |      |                 | link to image source     |
-|          |           |           |         |      |                 |                          |
 
 ** image_collection
-| property      | type | required? | unique? | key? | ref?                     | desc |
-|---------------+------+-----------+---------+------+--------------------------+------|
-| image_id      | UUID | Y         |         | Y    | image.image_id           |      |
-| collection_id | UUID | Y         |         | Y    | collection.collection_id |      |
+| property      | type | required? | unique? | key? | ref?                           | desc |
+|---------------+------+-----------+---------+------+--------------------------------+------|
+| image_id      | UUID | Y         |         | Y    | image.image_id                 |      |
+| collection_id | UUID | Y         |         | Y    | image_collection.collection_id |      |
+
+** image_tag
+| property | type | required? | unique? | key? | ref?           | desc                        |
+|----------+------+-----------+---------+------+----------------+-----------------------------|
+| image_id | UUID | Y         |         | Y    | image.image_id |                             |
+| tag      | TEXT | Y         |         | Y    |                | A keyword tag for the image |
