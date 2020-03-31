@@ -1,7 +1,7 @@
 DO $$
 BEGIN
-  DELETE FROM internal.ac_permission;
-  INSERT INTO internal.ac_permission (
+  DELETE FROM ac_permission;
+  INSERT INTO ac_permission (
                 permission_code
               )
        VALUES ( 'app_owner' ),
