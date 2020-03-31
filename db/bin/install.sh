@@ -7,6 +7,9 @@ if [ "${DEF_BASE_DIR}" = "" ]; then
 fi
 
 execute_all_sql_at_root() {
+    if [ ! -d "${1}" ]; then
+        return
+    fi
     for f in $(find "${1}" -name '*.sql'); do
         echo "${f}"
         psql -h ${PGHOST} -U ${PGUSER} -f "${f}"
@@ -19,9 +22,12 @@ c() {
 }
 
 
-execute_all_sql_at_root ${DEF_BASE_DIR}/extensions
-execute_all_sql_at_root ${DEF_BASE_DIR}/schemas
-execute_all_sql_at_root ${DEF_BASE_DIR}/tables
-execute_all_sql_at_root ${DEF_BASE_DIR}/views
-execute_all_sql_at_root ${DEF_BASE_DIR}/functions
-execute_all_sql_at_root ${DEF_BASE_DIR}/data
+execute_all_sql_at_root ${DEF_BASE_DIR}/internal/extensions
+execute_all_sql_at_root ${DEF_BASE_DIR}/internal/schemas
+execute_all_sql_at_root ${DEF_BASE_DIR}/internal/tables
+execute_all_sql_at_root ${DEF_BASE_DIR}/internal/views
+execute_all_sql_at_root ${DEF_BASE_DIR}/internal/functions
+execute_all_sql_at_root ${DEF_BASE_DIR}/internal/data
+
+execute_all_sql_at_root ${DEF_BASE_DIR}/api/views
+execute_all_sql_at_root ${DEF_BASE_DIR}/api/functions

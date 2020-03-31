@@ -1,5 +1,4 @@
-DROP FUNCTION IF EXISTS internal.ac_add_role_permission;
-CREATE FUNCTION internal.ac_add_role_permission(
+CREATE OR REPLACE FUNCTION internal.ac_add_role_permission(
   p_role_name         TEXT,
   p_permission_code   TEXT
 )

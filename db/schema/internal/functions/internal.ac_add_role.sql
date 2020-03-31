@@ -1,5 +1,4 @@
-DROP FUNCTION IF EXISTS internal.ac_add_role;
-CREATE FUNCTION internal.ac_add_role(
+CREATE OR REPLACE FUNCTION internal.ac_add_role(
   IN p_role_name          TEXT,
   IN p_role_description   TEXT          DEFAULT NULL
 )

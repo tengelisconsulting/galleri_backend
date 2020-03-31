@@ -1,5 +1,4 @@
-DROP FUNCTION IF EXISTS internal.ac_add_user;
-CREATE FUNCTION internal.ac_add_user(
+CREATE OR REPLACE FUNCTION internal.ac_add_user(
   IN   p_username      TEXT,
   IN   p_password      TEXT
 )

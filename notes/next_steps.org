@@ -1,8 +1,5 @@
-performance tests ->
+* performance tests
   - concurrent logins
   - concurrent session renews
   ...
   - concurrent permission checks
-
-next steps: ->
-  webapp

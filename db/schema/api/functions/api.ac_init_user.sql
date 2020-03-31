@@ -1,5 +1,4 @@
-DROP FUNCTION IF EXISTS api.ac_init_user;
-CREATE FUNCTION api.ac_init_user(
+CREATE OR REPLACE FUNCTION api.ac_init_user(
   p_username          TEXT,
   p_password          TEXT,
   p_role_names        TEXT[]

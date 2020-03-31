@@ -1,0 +1,61 @@
+* Accounts
+** ac_user
+| property      | type      | required? | unique? | key? | ref? | desc                    |
+|---------------+-----------+-----------+---------+------+------+-------------------------|
+| user_id       | UUID      | Y         | Y       | Y    |      |                         |
+| username      | TEXT      | Y         | Y       |      |      |                         |
+| password_hash | TEXT      | Y         |         |      |      | hash of user's password |
+| created       | TIMESTAMP | Y         |         |      |      |                         |
+| update        | TIMESTAMP | Y         |         |      |      |                         |
+
+** ac_permission
+| property        | type | required? | unique? | key? | ref? | desc |
+|-----------------+------+-----------+---------+------+------+------|
+| permission_id   | UUID | Y         | Y       | Y    |      |      |
+| permission_code | TEXT | Y         | Y       |      |      |      |
+
+** ac_role
+| property         | type | required? | unique? | key? | ref? | desc |
+|------------------+------+-----------+---------+------+------+------|
+| role_id          | UUID | Y         | Y       | Y    |      |      |
+| role_name        | TEXT | Y         | Y       |      |      |      |
+| role_description | TEXT |           |         |      |      |      |
+
+** ac_role_permission
+| property         | type | required? | unique? | key? | ref?                        | desc |
+|------------------+------+-----------+---------+------+-----------------------------+------|
+| role_id          | UUID | Y         |         | Y    | ac_role.role_id             |      |
+| permission_id    | UUID | Y         |         | Y    | ac_permission.permission_id |      |
+
+** ac_user_role
+| property | type | required? | unique? | key? | ref?            | desc |
+|----------+------+-----------+---------+------+-----------------+------|
+| user_id  | UUID | Y         |         | Y    | ac_user.user_id |      |
+| role_id  | UUID | Y         |         | Y    | ac_role.role_id |      |
+
+
+
+
+* Collections
+** collection
+| property      | type      | required? | unique? | key? | ref?         | desc                          |
+|---------------+-----------+-----------+---------+------+--------------+-------------------------------|
+| collection_id | UUID      | Y         | Y       | Y    |              |                               |
+| created       | TIMESTAMP | Y         |         |      |              |                               |
+| user_id       | UUID      | Y         |         |      | user.user_id | user that owns the collection |
+|               |           |           |         |      |              |                               |
+
+** image
+| property | type      | required? | unique? | key? | ref?            | desc                     |
+|----------+-----------+-----------+---------+------+-----------------+--------------------------|
+| image_id | UUID      | Y         | Y       | Y    |                 |                          |
+| created  | TIMESTAMP | Y         |         |      |                 |                          |
+| user_id  | UUID      | Y         |         |      | ac_user.user_id | user that owns the image |
+| href     | TEXT      | Y         |         |      |                 | link to image source     |
+|          |           |           |         |      |                 |                          |
+
+** image_collection
+| property      | type | required? | unique? | key? | ref?                     | desc |
+|---------------+------+-----------+---------+------+--------------------------+------|
+| image_id      | UUID | Y         |         | Y    | image.image_id           |      |
+| collection_id | UUID | Y         |         | Y    | collection.collection_id |      |
