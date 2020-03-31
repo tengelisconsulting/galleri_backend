@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION internal.ac_add_user_role(
+CREATE OR REPLACE FUNCTION ac_add_user_role(
   IN   p_username      TEXT,
   IN   p_role_name     TEXT
 )
@@ -10,16 +10,16 @@ DECLARE
 BEGIN
   SELECT user_id
     INTO v_user_id
-    FROM internal.ac_user
+    FROM ac_user
    WHERE username = p_username
   ;
   SELECT role_id
     INTO v_role_id
-    FROM internal.ac_role
+    FROM ac_role
    WHERE role_name = p_role_name
   ;
 
-  INSERT INTO internal.ac_user_role (
+  INSERT INTO ac_user_role (
                 user_id,
                 role_id
               )

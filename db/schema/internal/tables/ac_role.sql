@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS internal.ac_role (
+CREATE TABLE IF NOT EXISTS ac_role (
   role_id           UUID                NOT NULL
     DEFAULT uuid_generate_v1mc(),
   role_name         TEXT                NOT NULL
@@ -9,4 +9,4 @@ CREATE TABLE IF NOT EXISTS internal.ac_role (
   UNIQUE (role_name)
 );
 
-COMMENT ON TABLE internal.ac_role IS 'A named collection of permissions';
+COMMENT ON TABLE ac_role IS 'A named collection of permissions';

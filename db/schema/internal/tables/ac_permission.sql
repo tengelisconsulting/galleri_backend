@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS internal.ac_permission (
+CREATE TABLE IF NOT EXISTS ac_permission (
   permission_id      UUID              NOT NULL
     DEFAULT uuid_generate_v1mc(),
   permission_code    TEXT              NOT NULL
@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS internal.ac_permission (
   UNIQUE (permission_code)
 );
 
-COMMENT ON TABLE internal.ac_permission IS 'A permission';
+COMMENT ON TABLE ac_permission IS 'A permission';

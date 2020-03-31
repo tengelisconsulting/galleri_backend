@@ -1,7 +1,7 @@
 DO $$
 BEGIN
   BEGIN
-    PERFORM internal.ac_add_user(
+    PERFORM ac_add_user(
       p_username  => 'test_user',
       p_password  => 'a1s2d3f4g5'
     );
@@ -10,7 +10,7 @@ BEGIN
         NULL;
   END;
   BEGIN
-    PERFORM internal.ac_add_user_role(
+    PERFORM ac_add_user_role(
       p_username  => 'test_user',
       p_role_name  => 'BASE_USER'
     );

@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION internal.ac_add_role_permission(
+CREATE OR REPLACE FUNCTION ac_add_role_permission(
   p_role_name         TEXT,
   p_permission_code   TEXT
 )
@@ -10,15 +10,15 @@ DECLARE
 BEGIN
   SELECT role_id
     INTO v_role_id
-    FROM internal.ac_role
+    FROM ac_role
    WHERE role_name = p_role_name
   ;
   SELECT permission_id
     INTO v_permission_id
-    FROM internal.ac_permission
+    FROM ac_permission
    WHERE permission_code = p_permission_code
   ;
-  INSERT INTO internal.ac_role_permission (
+  INSERT INTO ac_role_permission (
                 role_id,
                 permission_id
               )

@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION internal.ac_add_role(
+CREATE OR REPLACE FUNCTION ac_add_role(
   IN p_role_name          TEXT,
   IN p_role_description   TEXT          DEFAULT NULL
 )
@@ -7,7 +7,7 @@ AS $$
 DECLARE
   v_role_id         UUID        := uuid_generate_v1mc();
 BEGIN
-  INSERT INTO internal.ac_role (
+  INSERT INTO ac_role (
                 role_id,
                 role_name,
                 role_description

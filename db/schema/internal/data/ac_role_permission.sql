@@ -1,6 +1,6 @@
 DO $$
 BEGIN
-  DELETE FROM internal.ac_role_permission;
-  PERFORM internal.ac_add_role_permission('ADMIN', 'app_owner');
+  DELETE FROM ac_role_permission;
+  PERFORM ac_add_role_permission('ADMIN', 'app_owner');
 END
 $$;
