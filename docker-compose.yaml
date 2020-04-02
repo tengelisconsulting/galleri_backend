@@ -42,6 +42,8 @@ services:
       - MG_RESP_PORT=${HTTP_ZMQ_RESP_PORT}
       - SESSION_TIMEOUT_S
       - LOG_LEVEL
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_KEY
     volumes:
       - ${PRIV_KEY_FILE}:/app/priv_key:ro
 
