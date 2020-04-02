@@ -38,20 +38,21 @@
 
 * Collections
 ** image_collection
-| property      | type      | required? | unique? | key? | ref?         | desc                          |
-|---------------+-----------+-----------+---------+------+--------------+-------------------------------|
-| collection_id | UUID      | Y         | Y       | Y    |              |                               |
-| created       | TIMESTAMP | Y         |         |      |              |                               |
-| user_id       | UUID      | Y         |         |      | user.user_id | user that owns the collection |
-|               |           |           |         |      |              |                               |
+| property        | type      | required? | unique?           | key? | ref?         | desc                          |
+|-----------------+-----------+-----------+-------------------+------+--------------+-------------------------------|
+| collection_id   | UUID      | Y         | Y                 | Y    |              |                               |
+| created         | TIMESTAMP | Y         |                   |      |              |                               |
+| user_id         | UUID      | Y         | + collection_name |      | user.user_id | user that owns the collection |
+| collection_name | TEXT      | Y         | + user_id         |      |              |                               |
 
 ** image
-| property | type      | required? | unique? | key? | ref?            | desc                     |
-|----------+-----------+-----------+---------+------+-----------------+--------------------------|
-| image_id | UUID      | Y         | Y       | Y    |                 |                          |
-| created  | TIMESTAMP | Y         |         |      |                 |                          |
-| user_id  | UUID      | Y         |         |      | ac_user.user_id | user that owns the image |
-| href     | TEXT      | Y         |         |      |                 | link to image source     |
+| property    | type      | required? | unique? | key? | ref?            | desc                               |
+|-------------+-----------+-----------+---------+------+-----------------+------------------------------------|
+| image_id    | UUID      | Y         | Y       | Y    |                 |                                    |
+| created     | TIMESTAMP | Y         |         |      |                 |                                    |
+| user_id     | UUID      | Y         |         |      | ac_user.user_id | user that owns the image           |
+| href        | TEXT      | Y         |         |      |                 | link to image source               |
+| description | TEXT      |           |         |      |                 | a textual description of the image |
 
 ** image_collection_image
 | property      | type | required? | unique? | key? | ref?                           | desc |

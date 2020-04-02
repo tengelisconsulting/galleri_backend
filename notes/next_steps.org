@@ -3,3 +3,9 @@
   - concurrent session renews
   ...
   - concurrent permission checks
+
+- outline interaction with the DO spaces API -
+  - I believe you should be able to proxy the request to DO and add the appropriate headers after you've done auth in openresty
+
+
+- random, but I think the main mg2_handler should use a process pool executor to launch a loop per core

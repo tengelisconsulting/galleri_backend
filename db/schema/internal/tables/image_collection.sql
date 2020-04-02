@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS image_collection (
     DEFAULT now(),
   user_id           UUID                NOT NULL
     REFERENCES ac_user (user_Id),
+  collection_name   TEXT                NOT NULL,
 
+  UNIQUE (user_id, collection_name),
   PRIMARY KEY (collection_id)
 );

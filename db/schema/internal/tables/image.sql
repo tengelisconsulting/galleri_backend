@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS image (
   href          TEXT                      NOT NULL,
   user_id       UUID                      NOT NULL
     REFERENCES ac_user (user_id),
+  description   TEXT,
 
   PRIMARY KEY (image_id)
 );
