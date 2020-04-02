@@ -5,7 +5,7 @@ import galleri.aws as aws
 
 def main()-> None:
     req = aws.AwsReq(
-        method = "PUT",
+        method = "GET",
         url = "https://s3.ca-central-1.amazonaws.com/galleri-storage-1/test3.file"
     )
     headers = aws.get_aws_headers(req)

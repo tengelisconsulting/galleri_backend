@@ -17,13 +17,7 @@ SIGV4_TIMESTAMP = '%Y%m%dT%H%M%SZ'
 
 SERVICE_REGION_REGX = re.compile("(.*)\.(.*)\.amazonaws\.com")
 
-HEADERS_TO_SIGN = [
-    "host",
-    "x-amz-content-sha256",
-    "x-amz-date",
-]
-
-class InternalReqState(NamedTuple):
+class _Req(NamedTuple):
     now: datetime
     method: str
     url: str
@@ -40,19 +34,19 @@ def get_aws_headers(req: AwsReq)-> Dict:
     hostname = urlparse(req.url).hostname
     service, region = re.search(SERVICE_REGION_REGX, hostname) \
                         .groups()
-    req = InternalReqState(
+    req = _Req(
         now = datetime.utcnow(),
         method = req.method,
         url = req.url,
         service = service,
-        region = region
+        region = region,
     )
     headers = _get_no_auth_headers(req)
     headers['Authorization'] = _get_auth_header(req)
     return headers
 
 
-def _get_auth_header(req: InternalReqState)-> str:
+def _get_auth_header(req: _Req)-> str:
     sig_vsn = "AWS4-HMAC-SHA256"
     cred_date = req.now.strftime("%Y%m%d")
     credential = f"{ACCESS_KEY}/{cred_date}/{req.region}/{req.service}/aws4_request"
@@ -64,7 +58,7 @@ def _get_auth_header(req: InternalReqState)-> str:
     return f"{sig_vsn} Credential={credential}, SignedHeaders={signed_headers}, Signature={signature}"
 
 
-def _get_string_to_sign(req: InternalReqState)-> str:
+def _get_string_to_sign(req: _Req)-> str:
     algo = "AWS4-HMAC-SHA256"
     can_req = _get_canonical_request(req)
     hashed_req = _hex_hash(can_req.encode("utf-8"))
@@ -75,7 +69,7 @@ def _get_string_to_sign(req: InternalReqState)-> str:
     return f"{algo}\n{time_s}\n{cred_scope}\n{hashed_req}"
 
 
-def _get_signing_key(req: InternalReqState)-> str:
+def _get_signing_key(req: _Req)-> str:
     date_key = _hmac_sha256(
         ("AWS4" + SECRET_KEY).encode("utf-8"),
         req.now.strftime("%Y%m%d")
@@ -104,13 +98,12 @@ def _hmac_sha256(key: bytes, msg: str, is_hex = False)-> str:
         return signed.digest()
 
 
-def _get_canonical_request(req: InternalReqState)-> str:
+def _get_canonical_request(req: _Req)-> str:
     can_uri = urlparse(req.url).path
     # can_qs = req.query_s
     can_qs = ""
     can_headers = _get_canonical_headers(req)
     signed_headers = _get_signed_headers(req)
-    # hashed_payload = hex_hash(req.payload)
     hashed_payload = UNSIGNED_PAYLOAD
     return f"{req.method}\n{can_uri}\n{can_qs}\n{can_headers}\n{signed_headers}\n{hashed_payload}"
 
@@ -121,7 +114,7 @@ def _hex_hash(b: bytes) -> str:
                   .lower()
 
 
-def _get_canonical_headers(req: InternalReqState)-> str:
+def _get_canonical_headers(req: _Req)-> str:
     headers = _get_no_auth_headers(req)
     def format_line(key: str):
         val = headers[key]
@@ -136,14 +129,14 @@ def _get_canonical_headers(req: InternalReqState)-> str:
     return "\n".join(lines) + "\n" # THERE IS A NEWLINE AT THE END
 
 
-def _get_signed_headers(req: InternalReqState)-> str:
+def _get_signed_headers(req: _Req)-> str:
     headers = _get_no_auth_headers(req)
     return ";".join(
         sorted(headers.keys())
     )
 
 
-def _get_no_auth_headers(req: InternalReqState)-> Dict:
+def _get_no_auth_headers(req: _Req)-> Dict:
     # as best I can tell, header values should not be lowercased,
     # but the keys must
     hostname = urlparse(req.url).hostname
