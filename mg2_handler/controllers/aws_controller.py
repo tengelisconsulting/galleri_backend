@@ -12,7 +12,7 @@ import galleri.aws as aws
 
 
 @req_mapping(path="/aws/headers-for-req", method="GET")
-def new_session_token(
+def get_aws_headers(
         req_state: ReqState
 )-> ResState:
     q_params = parse_qs(req_state.req.headers['QUERY'])
@@ -23,5 +23,5 @@ def new_session_token(
         url = url
     ))
     return response.ok({
-        "headers": headers,
+        "aws_headers": headers,
     })
