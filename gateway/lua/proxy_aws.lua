@@ -15,6 +15,7 @@ local function set_aws_req()
    local obj_id = ngx.var.obj_id
    local method = ngx.req.get_method()
    local target_url = get_target_url(obj_id)
+   ngx.var.target_url = target_url
    ngx.log(ngx.INFO, "target url")
    ngx.log(ngx.INFO, target_url)
    local encoded_url = ngx.escape_uri(target_url)
@@ -33,7 +34,6 @@ local function set_aws_req()
       ngx.req.set_header(k, v)
    end
    ngx.req.set_uri_args({})     -- I don't need any for now
-   -- ngx.redirect(target_url)
 end
 
 
