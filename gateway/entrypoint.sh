@@ -16,6 +16,8 @@ main() {
     env_sub PGST_HOST
     env_sub PGST_PORT
     env_sub LUA_CODE_CACHE
+    env_sub OBJ_STORAGE_HOST
+    env_sub OBJ_STORAGE_BUCKET
 
     openresty -p `pwd`/ -c nginx/nginx.conf
 
