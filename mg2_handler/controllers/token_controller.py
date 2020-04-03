@@ -43,10 +43,18 @@ def parse_token(
         req_state: ReqState
 )-> ResState:
     req_body = request.read_body(req_state)
+    if "token" not in req_body:
+        return response.bad_request({
+            "err": "need key 'token'"
+        })
+    if "is_refresh" not in req_body:
+        return response.bad_request({
+            "err": "need key 'is_refresh'"
+        })
     claims = get_claims(
         req_body["token"],
         req_body["is_refresh"]
-    )
+    )                           # if this errors, it bubbles up
     return response.ok({
         "claims": claims
     })

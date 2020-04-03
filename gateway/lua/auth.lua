@@ -3,8 +3,10 @@ local cjson = require "cjson"
 local app_cookie = require "lua/app_cookie"
 local app_http = require "lua/app_http"
 local downstream = require "lua/downstream"
+local log = require "lua/log"
 
 local REFRESH_TOKEN_NAME = "galleri_refresh_token"
+local TOKEN_CAPTURE = "Bearer: (.*)"
 
 -- private
 local function get_token(user_id, is_refresh)
@@ -144,22 +146,43 @@ local function renew_session()
    return respond_new_session(claims.user_id)
 end
 
+local function authenticate_fail(err_msg)
+   local msg = "request authorizaation failed - " .. err_msg
+   ngx.status = 401
+   log.err(msg)
+   ngx.say(cjson.encode({
+                 err = msg
+   }))
+   ngx.exit(401)
+end
+
 local function verify_req()
-   -- get user id from token
-   -- local session_res = app_http.req_http_zmq({
-   --       path = "/token/parse",
-   --       method = "POST",
-   --       body = cjson.encode({
-   --             token = refresh_token,
-   --             is_refresh = true,
-   --       }),
-   -- })
-   if not true then
-      ngx.exit(ngx.HTTP_FORBIDDEN)
+   local auth_header = ngx.var.http_authorization
+   if not auth_header then
+      authenticate_fail("no auth header")
       return
    end
-   -- adds the 'user-id' header as well
-
+   local _, _, token = string.find(auth_header, TOKEN_CAPTURE)
+   if not token then
+      authenticate_fail("bad auth header")
+      return
+   end
+   -- get user id from token
+   local session_res = app_http.req_http_zmq({
+         path = "/token/parse",
+         method = "POST",
+         body = cjson.encode({
+               token = token,
+               is_refresh = false,
+         }),
+   })
+   if session_res.err then
+      authenticate_fail("token verification failed")
+      return
+   end
+   local res_body = cjson.decode(session_res.body)
+   local user_id = res_body.claims.user_id
+   ngx.req.set_header("user-id", user_id)
 end
 
 -- module
