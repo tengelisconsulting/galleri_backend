@@ -52,6 +52,25 @@ local function req(host, port, spec, timeout)
    }
 end
 
+local function one_and_done(
+      url,
+      spec,
+      con_timeout
+                           )
+   if not con_timeout then
+      con_timeout = 500
+   end
+   if not spec.keepalive_ms then
+      spec.keepalive_ms = 60000
+   end
+   if not spec.keepalive_pool then
+      spec.keepalive_pool = 10
+   end
+   local httpc = http:new()
+   httpc:set_timeout(con_timeout)
+   return httpc:request_uri(url, spec) -- res, err
+end
+
 local function proxy_request(host, port, changes)
    local body = changes.body
    if not body then
@@ -91,9 +110,10 @@ end
 
 
 local M = {}
+M.one_and_done = one_and_done
+M.proxy_pgst = proxy_pgst
+M.proxy_request = proxy_request
 M.req = req
 M.req_http_zmq = req_http_zmq
 M.req_pgst = req_pgst
-M.proxy_pgst = proxy_pgst
-M.proxy_request = proxy_request
 return M

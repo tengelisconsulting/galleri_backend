@@ -36,12 +36,23 @@ local function get_obj_storage_endpoint()
    return OBJ_STORAGE_HOST .. "/" .. OBJ_STORAGE_BUCKET
 end
 
+local function get_obj_storage_host()
+   return OBJ_STORAGE_HOST
+end
+
+local function get_obj_storage_path()
+   return "/" .. OBJ_STORAGE_BUCKET
+end
+
+
 -- module
 local M = {}
 M.get_allowed_origin = get_allowed_origin
 M.get_http_zmq_host = get_http_zmq_host
 M.get_http_zmq_port = get_http_zmq_port
 M.get_obj_storage_endpoint = get_obj_storage_endpoint
+M.get_obj_storage_host = get_obj_storage_host
+M.get_obj_storage_path = get_obj_storage_path
 M.get_pgst_host = get_pgst_host
 M.get_pgst_port = get_pgst_port
 return M
