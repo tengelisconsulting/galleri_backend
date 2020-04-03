@@ -8,6 +8,7 @@ local log = require "lua/log"
 local REFRESH_TOKEN_NAME = "galleri_refresh_token"
 local TOKEN_CAPTURE = "Bearer: (.*)"
 
+
 -- private
 local function get_token(user_id, is_refresh)
    local function get_path()
@@ -147,16 +148,28 @@ local function renew_session()
 end
 
 local function authenticate_fail(err_msg)
+   local status = 401
    local msg = "request authorizaation failed - " .. err_msg
-   ngx.status = 401
+   ngx.status = status
    log.err(msg)
    ngx.say(cjson.encode({
                  err = msg
    }))
-   ngx.exit(401)
+   ngx.exit(status)
 end
 
-local function verify_req()
+local function authorize_fail(err_msg)
+   local status = 403
+   local msg = "request authorization failed - " .. err_msg
+   ngx.status = status
+   log.err(msg)
+   ngx.say(cjson.encode({
+                 err = msg
+   }))
+   ngx.exit(status)
+end
+
+local function authenticate_req()
    local auth_header = ngx.var.http_authorization
    if not auth_header then
       authenticate_fail("no auth header")
@@ -183,6 +196,29 @@ local function verify_req()
    local res_body = cjson.decode(session_res.body)
    local user_id = res_body.claims.user_id
    ngx.req.set_header("user-id", user_id)
+   return user_id
+end
+
+local function authorize_owner(user_id, obj_id)
+   local headers = {}
+   headers["user-id"] = user_id
+   local auth_res = app_http.req_pgst({
+         path = "/rpc/check_session_owns",
+         method = "POST",
+         body = cjson.encode({
+               p_obj_id = obj_id
+         }),
+         headers = headers
+   })
+   if auth_res.err then
+      authorize_fail("failed to determine session ownership")
+      return
+   end
+   local is_success = cjson.decode(auth_res.body)
+   if is_success == true then
+      return true
+   end
+   authorize_fail("session requested access to an object it don't own")
 end
 
 -- module
@@ -190,5 +226,6 @@ local M = {}
 M.authenticate_username_password = authenticate_username_password
 M.init_user = init_user
 M.renew_session = renew_session
-M.verify_req = verify_req
+M.authenticate_req = authenticate_req
+M.authorize_owner = authorize_owner
 return M

@@ -4,10 +4,5 @@ AS
          ic.created,
          ic.user_id
     FROM image_collection ic
-   WHERE ic.user_id = str_to_uuid(
-                        current_setting(
-                          'request.header.user-id',
-                          true
-                        )
-                      )
+   WHERE ic.user_id = session_user_id()
 ;
