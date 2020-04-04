@@ -41,7 +41,7 @@ local function req_aws(obj_id, method, req_body)
       log.err("failed to handle req to aws - %s", err)
       return nil, 500
    end
-   if 200 == aws_res.status then
+   if 200 <= aws_res.status and aws_res.status < 400 then
       return aws_res, nil
    end
    log.err("req to aws received error code - %s", aws_res.status)
@@ -49,5 +49,6 @@ local function req_aws(obj_id, method, req_body)
 end
 
 local M = {}
+M.get_target_url = get_target_url
 M.req_aws = req_aws
 return M

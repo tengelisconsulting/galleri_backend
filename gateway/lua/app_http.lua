@@ -80,10 +80,10 @@ local function proxy_request(host, port, changes)
    }
    local res = req(host, port, req_spec)
    ngx.status = res.status
-   log.err("error proxying request - %s", res.err)
    if res.body then
       ngx.say(res.body)
    elseif res.err then
+      log.err("error proxying request - %s", res.err)
       ngx.say(
          cjson.encode({
                err = res.err

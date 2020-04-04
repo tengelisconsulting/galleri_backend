@@ -20,8 +20,9 @@ local function get_obj(obj_type, obj_id)
 end
 
 local function put_obj(obj_type, obj_id)
-   local init_url = "/rpc/" .. obj_type .. "_create"
-   local delete_url = "/rpc/" .. obj_type .. "_delete"
+   local init_url = string.format("/rpc/%s_create", obj_type)
+   local delete_url = string.format("/rpc/%s_delete", obj_type)
+   local update_url = string.format("/rpc/%s_update", obj_type)
    local init_res = app_http.req_sys_pgst({
          path = init_url,
          method = "POST",
@@ -40,7 +41,7 @@ local function put_obj(obj_type, obj_id)
       obj_id, "PUT", downstream.get_body_string()
    )
    if err_code then
-      log.err("failed to save object %s - will remove record", obj_id)
+      log.err("failed to save object %s to storage - will remove record", obj_id)
       local del_res = app_http.req_sys_pgst({
             path = delete_url,
             method = "POST",
@@ -49,17 +50,31 @@ local function put_obj(obj_type, obj_id)
             }),
       })
       if del_res.err then
-         log.err("FAILED TO DELETE OBJECT %s - THIS WILL BECOME A GHOST OBJECT", obj_id)
+         log.err("FAILED TO DELETE OBJECT %s - THIS OBJECT WILL EXIST IN STORAGE BUT IS NOT TRACKED", obj_id)
       end
       respond.die(err_code, "obj storage failure")
       return
    end
-   respond.success("object " .. obj_id .. " created")
+   local update_res = app_http.req_pub_pgst({
+         path = update_url,
+         method = "POST",
+         body = cjson.encode({
+               p_obj_id = obj_id,
+               p_href = aws.get_target_url(obj_id)
+         }),
+   })
+   if update_res.err then
+      log.err("failed to update href for object %s", obj_id)
+   end
+   respond.success(string.format("object %s created", obj_id))
 end
 
 local function delete_obj(obj_type, obj_id)
-   -- first delete from aws...
-   local delete_url = "/rpc/" .. obj_type .. "_delete"
+   local aws_res, err_code = aws.req_aws(obj_id, "DELETE")
+   if err_code then
+      respond.die(err_code, "object storage delete failed")
+   end
+   local delete_url = string.format("/rpc/%s_delete", obj_type)
    return app_http.proxy_sys_pgst({
          path = delete_url,
          method = "POST",
@@ -69,20 +84,45 @@ local function delete_obj(obj_type, obj_id)
    })
 end
 
+
+local OBJECTS_READ_OK = {
+   image = true
+}
+local OBJECTS_CREATE_OK = {
+   image = true
+}
+local OBJECTS_DELETE_OK = {
+   image = true
+}
+
 -- public
 local function access_obj(obj_type, obj_id)
-   local method = ngx.req.get_method()
-   if obj_type ~= "image" then  -- add others with time
-      respond.die(400, "unrecognized object type: " .. obj_type)
-      return
+   local function bad_obj_method()
+      respond.die(
+         400, "method %s not supported for object type %s",
+         method, obj_type
+      )
    end
+   local method = ngx.req.get_method()
    if method == "GET" then
+      if not OBJECTS_READ_OK[obj_type] then
+         bad_obj_method()
+         return
+      end
       return get_obj(obj_type, obj_id)
    end
    if method == "PUT" then
+      if not OBJECTS_CREATE_OK[obj_type] then
+         bad_obj_method()
+         return
+      end
       return put_obj(obj_type, obj_id)
    end
    if method == "DELETE" then
+      if not OBJECTS_DELETE_OK[obj_type] then
+         bad_obj_method()
+         return
+      end
       return delete_obj(obj_type, obj_id)
    end
    ngx.exit(405)
