@@ -31,3 +31,6 @@ execute_all_sql_at_root ${DEF_BASE_DIR}/internal/data
 
 execute_all_sql_at_root ${DEF_BASE_DIR}/api/views
 execute_all_sql_at_root ${DEF_BASE_DIR}/api/functions
+
+execute_all_sql_at_root ${DEF_BASE_DIR}/sys/views
+execute_all_sql_at_root ${DEF_BASE_DIR}/sys/functions

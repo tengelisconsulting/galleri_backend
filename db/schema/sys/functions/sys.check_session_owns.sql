@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION api.check_session_owns(
+CREATE OR REPLACE FUNCTION sys.check_session_owns(
   IN p_obj_id              TEXT,
   IN p_if_no_exists        BOOLEAN      DEFAULT true
 )

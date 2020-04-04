@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW api.meta_user_permission
+CREATE OR REPLACE VIEW sys.user_permission
 AS
   SELECT u.user_id,
          u.username,

@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION api.check_username_password(
+CREATE OR REPLACE FUNCTION sys.check_username_password(
   IN p_username    TEXT,
   IN p_password    TEXT
 )
