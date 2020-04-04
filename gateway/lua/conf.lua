@@ -1,58 +1,21 @@
 local os = require "os"
 
-
--- private
-local ALLOWED_ORIGIN = os.getenv("ALLOWED_ORIGIN")
-local PGST_HOST = os.getenv("PGST_HOST")
-local PGST_PORT = tonumber(os.getenv("PGST_PORT"))
-local HTTP_ZMQ_HOST = os.getenv("HTTP_ZMQ_HOST")
-local HTTP_ZMQ_PORT = tonumber(os.getenv("HTTP_ZMQ_HTTP_PORT"))
-local OBJ_STORAGE_HOST = os.getenv("OBJ_STORAGE_HOST")
-local OBJ_STORAGE_BUCKET = os.getenv("OBJ_STORAGE_BUCKET")
+local log = require "lua/log"
 
 
--- public
-local function get_allowed_origin()
-   return ALLOWED_ORIGIN
-end
-
-local function get_pgst_host()
-   return PGST_HOST
-end
-
-local function get_pgst_port()
-   return PGST_PORT
-end
-
-local function get_http_zmq_host()
-   return HTTP_ZMQ_HOST
-end
-
-local function get_http_zmq_port()
-   return HTTP_ZMQ_PORT
-end
-
-local function get_obj_storage_endpoint()
-   return OBJ_STORAGE_HOST .. "/" .. OBJ_STORAGE_BUCKET
-end
-
-local function get_obj_storage_host()
-   return OBJ_STORAGE_HOST
-end
-
-local function get_obj_storage_path()
-   return "/" .. OBJ_STORAGE_BUCKET
-end
-
-
--- module
 local M = {}
-M.get_allowed_origin = get_allowed_origin
-M.get_http_zmq_host = get_http_zmq_host
-M.get_http_zmq_port = get_http_zmq_port
-M.get_obj_storage_endpoint = get_obj_storage_endpoint
-M.get_obj_storage_host = get_obj_storage_host
-M.get_obj_storage_path = get_obj_storage_path
-M.get_pgst_host = get_pgst_host
-M.get_pgst_port = get_pgst_port
+
+M.ALLOWED_ORIGIN = os.getenv("ALLOWED_ORIGIN")
+M.HTTP_ZMQ_HOST = os.getenv("HTTP_ZMQ_HOST")
+M.HTTP_ZMQ_PORT = tonumber(os.getenv("HTTP_ZMQ_HTTP_PORT"))
+M.OBJ_STORAGE_HOST = os.getenv("OBJ_STORAGE_HOST")
+M.OBJ_STORAGE_BUCKET = os.getenv("OBJ_STORAGE_BUCKET")
+M.PUB_PGST_HOST = os.getenv("PUB_PGST_HOST")
+M.PUB_PGST_PORT = tonumber(os.getenv("PUB_PGST_PORT"))
+M.SYS_PGST_HOST = os.getenv("SYS_PGST_HOST")
+M.SYS_PGST_PORT = tonumber(os.getenv("SYS_PGST_PORT"))
+
+log.info("ENV - ", log.table_print(M))
+
 return M
+-- just don't rewrite these...

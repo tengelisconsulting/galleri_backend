@@ -82,7 +82,7 @@ local function init_user()
          p_role_names = cjson.empty_array,
    })
    ngx.log(ngx.NOTICE, req_body)
-   app_http.proxy_pgst({
+   app_http.proxy_sys_pgst({
          path = "/rpc/ac_init_user",
          method = "POST",
          headers = {},
@@ -96,7 +96,7 @@ local function authenticate_username_password()
          p_username = data.username,
          p_password = data.password
    })
-   local login_res = app_http.req_pgst({
+   local login_res = app_http.req_sys_pgst({
          path = "/rpc/check_username_password",
          method = "POST",
          body = req_body,
@@ -202,7 +202,7 @@ end
 local function authorize_owner(user_id, obj_id)
    local headers = {}
    headers["user-id"] = user_id
-   local auth_res = app_http.req_pgst({
+   local auth_res = app_http.req_sys_pgst({
          path = "/rpc/check_session_owns",
          method = "POST",
          body = cjson.encode({

@@ -4,12 +4,6 @@ local http = require "resty.http"
 local conf = require "lua/conf"
 
 
-local PGST_HOST = conf.get_pgst_host()
-local PGST_PORT = conf.get_pgst_port()
-local HTTP_ZMQ_HOST = conf.get_http_zmq_host()
-local HTTP_ZMQ_PORT = conf.get_http_zmq_port()
-
-
 local function req(host, port, spec, timeout)
    if not timeout then
       timeout = 500
@@ -96,24 +90,34 @@ local function proxy_request(host, port, changes)
    ngx.say(res.body)
 end
 
-local function req_pgst(spec)
-   return req(PGST_HOST, PGST_PORT, spec)
+local function req_pub_pgst(spec)
+   return req(conf.PUB_PGST_HOST, conf.PUB_PGST_PORT, spec)
+end
+
+local function req_sys_pgst(spec)
+   return req(conf.SYS_PGST_HOST, conf.SYS_PGST_PORT, spec)
 end
 
 local function req_http_zmq(spec)
-   return req(HTTP_ZMQ_HOST, HTTP_ZMQ_PORT, spec)
+   return req(conf.HTTP_ZMQ_HOST, conf.HTTP_ZMQ_PORT, spec)
 end
 
-local function proxy_pgst(changes)
-   proxy_request(PGST_HOST, PGST_PORT, changes)
+local function proxy_pub_pgst(changes)
+   proxy_request(conf.PUB_PGST_HOST, conf.PUB_PGST_PORT, changes)
+end
+
+local function proxy_sys_pgst(changes)
+   proxy_request(conf.SYS_PGST_HOST, conf.SYS_PGST_PORT, changes)
 end
 
 
 local M = {}
 M.one_and_done = one_and_done
-M.proxy_pgst = proxy_pgst
+M.proxy_pub_pgst = proxy_pub_pgst
+M.proxy_sys_pgst = proxy_sys_pgst
 M.proxy_request = proxy_request
 M.req = req
 M.req_http_zmq = req_http_zmq
-M.req_pgst = req_pgst
+M.req_pub_pgst = req_pub_pgst
+M.req_sys_pgst = req_sys_pgst
 return M

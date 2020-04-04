@@ -17,8 +17,10 @@ services:
     environment:
       - GATEWAY_PORT
       - ALLOWED_ORIGIN
-      - PGST_HOST
-      - PGST_PORT
+      - PUB_PGST_HOST
+      - PUB_PGST_PORT
+      - SYS_PGST_HOST
+      - SYS_PGST_PORT
       - LUA_CODE_CACHE
       - HTTP_ZMQ_HOST
       - HTTP_ZMQ_HTTP_PORT

@@ -6,9 +6,9 @@ local downstream = require "lua/downstream"
 local log = require "lua/log"
 
 
-local OBJ_STORAGE_HOST = conf.get_obj_storage_host()
-local OBJ_STORAGE_ENDPOINT = conf.get_obj_storage_endpoint()
-local OBJ_STORAGE_PATH = conf.get_obj_storage_path()
+local OBJ_STORAGE_ENDPOINT = conf.OBJ_STORAGE_HOST .. "/"
+   ..conf.OBJ_STORAGE_BUCKET
+local OBJ_STORAGE_PATH = "/" .. conf.OBJ_STORAGE_BUCKET
 
 local function get_target_url(obj_id)
    return "https://" .. OBJ_STORAGE_ENDPOINT .. "/" .. obj_id

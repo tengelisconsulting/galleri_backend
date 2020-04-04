@@ -43,18 +43,6 @@ local function table_print (tt, indent, done)
    end
 end
 
--- function to_string( tbl )
---    if  "nil"       == type( tbl ) then
---       return tostring(nil)
---    elseif  "table" == type( tbl ) then
---       return table_print(tbl)
---    elseif  "string" == type( tbl ) then
---       return tbl
---    else
---       return tostring(tbl)
---    end
--- end
-
 local M = {}
 M.info = info
 M.err = err

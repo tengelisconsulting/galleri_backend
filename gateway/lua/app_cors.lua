@@ -1,11 +1,10 @@
 local conf = require "lua/conf"
 
-local ALLOWED_ORIGIN = conf.get_allowed_origin()
 
 local function set_cors_headers()
    if ngx.req.get_method() == "OPTIONS" then
       ngx.header["Access-Control-Allow-Credentials"] = "true"
-      ngx.header["Access-Control-Allow-Origin"] = ALLOWED_ORIGIN;
+      ngx.header["Access-Control-Allow-Origin"] = conf.ALLOWED_ORIGIN;
       ngx.header["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS" ;
       ngx.header["Access-Control-Allow-Headers"] = "Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Requested-With,Referer,Sec-Fetch-Dest";
       ngx.header["Access-Control-Expose-Headers"] = "Content-Length,Content-Range";
@@ -15,7 +14,7 @@ local function set_cors_headers()
       ngx.exit(204)
    else
       ngx.header["Access-Control-Allow-Credentials"] = "true"
-      ngx.header["Access-Control-Allow-Origin"] = ALLOWED_ORIGIN;
+      ngx.header["Access-Control-Allow-Origin"] = conf.ALLOWED_ORIGIN;
    end
 end
 

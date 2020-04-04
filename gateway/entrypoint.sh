@@ -13,8 +13,8 @@ main() {
 
     cp nginx/nginx.template.conf nginx/nginx.conf
     env_sub GATEWAY_PORT
-    env_sub PGST_HOST
-    env_sub PGST_PORT
+    env_sub PUB_PGST_HOST
+    env_sub PUB_PGST_PORT
     env_sub LUA_CODE_CACHE
     env_sub OBJ_STORAGE_HOST
     env_sub OBJ_STORAGE_BUCKET
