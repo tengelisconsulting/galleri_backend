@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS image (
     DEFAULT uuid_generate_v1mc(),
   created       TIMESTAMPTZ               NOT NULL
     DEFAULT now(),
-  href          TEXT                      NOT NULL,
+  href          TEXT,
   user_id       UUID                      NOT NULL
     REFERENCES ac_user (user_id),
   description   TEXT,

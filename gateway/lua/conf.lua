@@ -15,7 +15,5 @@ M.PUB_PGST_PORT = tonumber(os.getenv("PUB_PGST_PORT"))
 M.SYS_PGST_HOST = os.getenv("SYS_PGST_HOST")
 M.SYS_PGST_PORT = tonumber(os.getenv("SYS_PGST_PORT"))
 
-log.info("ENV - ", log.table_print(M))
-
 return M
 -- just don't rewrite these...

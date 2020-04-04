@@ -4,6 +4,7 @@ local app_cookie = require "lua/app_cookie"
 local app_http = require "lua/app_http"
 local downstream = require "lua/downstream"
 local log = require "lua/log"
+local respond = require "lua/respond"
 
 local REFRESH_TOKEN_NAME = "galleri_refresh_token"
 local TOKEN_CAPTURE = "Bearer: (.*)"
@@ -150,23 +151,13 @@ end
 local function authenticate_fail(err_msg)
    local status = 401
    local msg = "request authorizaation failed - " .. err_msg
-   ngx.status = status
-   log.err(msg)
-   ngx.say(cjson.encode({
-                 err = msg
-   }))
-   ngx.exit(status)
+   respond.die(401, msg)
 end
 
 local function authorize_fail(err_msg)
-   local status = 403
    local msg = "request authorization failed - " .. err_msg
-   ngx.status = status
    log.err(msg)
-   ngx.say(cjson.encode({
-                 err = msg
-   }))
-   ngx.exit(status)
+   respond.die(403, msg)
 end
 
 local function authenticate_req()
@@ -195,18 +186,17 @@ local function authenticate_req()
    end
    local res_body = cjson.decode(session_res.body)
    local user_id = res_body.claims.user_id
-   ngx.req.set_header("user-id", user_id)
+   ngx.var.user_id = user_id
    return user_id
 end
 
 local function authorize_owner(user_id, obj_id)
-   local headers = {}
-   headers["user-id"] = user_id
    local auth_res = app_http.req_sys_pgst({
          path = "/rpc/check_session_owns",
          method = "POST",
          body = cjson.encode({
-               p_obj_id = obj_id
+               p_user_id = user_id,
+               p_obj_id = obj_id,
          }),
          headers = headers
    })

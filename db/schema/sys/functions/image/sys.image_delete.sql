@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION sys.image_delete(
-  IN p_image_id         image.image_id%TYPE
+  IN p_obj_id         image.image_id%TYPE
 )
 RETURNS INTEGER
 AS $$
@@ -8,7 +8,7 @@ DECLARE
 BEGIN
   WITH deleted AS (
   DELETE FROM image
-        WHERE image_id = p_image_id
+        WHERE image_id = p_obj_id
     RETURNING *
   )
   SELECT count(*)

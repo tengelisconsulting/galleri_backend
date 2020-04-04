@@ -2,6 +2,7 @@ local cjson = require "cjson"
 local http = require "resty.http"
 
 local conf = require "lua/conf"
+local log = require "lua/log"
 
 
 local function req(host, port, spec, timeout)
@@ -18,7 +19,7 @@ local function req(host, port, spec, timeout)
          body = spec.body
    })
    if err then
-      ngx.log(ngx.ERR, "req failed: " .. err)
+      log.err("req failed: %s", err)
       return {
          status = 502,
          err = err,
@@ -27,7 +28,7 @@ local function req(host, port, spec, timeout)
    end
    local body, err = res:read_body()
    if err then
-      ngx.log(ngx.ERR, "failed to read body: " .. err)
+      log.err("failed to read body: %s", err)
       return {
          status = 502,
          err = err,
@@ -79,15 +80,16 @@ local function proxy_request(host, port, changes)
    }
    local res = req(host, port, req_spec)
    ngx.status = res.status
-   if res.err then
+   log.err("error proxying request - %s", res.err)
+   if res.body then
+      ngx.say(res.body)
+   elseif res.err then
       ngx.say(
          cjson.encode({
                err = res.err
          })
       )
-      return
    end
-   ngx.say(res.body)
 end
 
 local function req_pub_pgst(spec)
@@ -103,10 +105,13 @@ local function req_http_zmq(spec)
 end
 
 local function proxy_pub_pgst(changes)
+   changes.headers = {}
+   changes.headers["user-id"] = ngx.var.user_id
    proxy_request(conf.PUB_PGST_HOST, conf.PUB_PGST_PORT, changes)
 end
 
 local function proxy_sys_pgst(changes)
+   changes.headers = {}
    proxy_request(conf.SYS_PGST_HOST, conf.SYS_PGST_PORT, changes)
 end
 
