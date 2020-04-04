@@ -93,6 +93,10 @@ local function proxy_request(host, port, changes)
 end
 
 local function req_pub_pgst(spec)
+   if not spec.headers then
+      spec.headers = {}
+   end
+   spec.headers["user-id"] = ngx.var.user_id
    return req(conf.PUB_PGST_HOST, conf.PUB_PGST_PORT, spec)
 end
 

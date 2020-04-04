@@ -102,7 +102,7 @@ local function authenticate_username_password()
          method = "POST",
          body = req_body,
    })
-   if login_res.status ~= 200 then
+   if login_res.err then
       ngx.status = 401
       ngx.say(login_res.err)
       return
@@ -136,7 +136,7 @@ local function renew_session()
                is_refresh = true,
          }),
    })
-   if session_res.status ~= 200 then
+   if session_res.err then
       ngx.log(ngx.ERR, session_res.err)
       ngx.status = 401
       ngx.say(cjson.encode({
@@ -187,6 +187,7 @@ local function authenticate_req()
    local res_body = cjson.decode(session_res.body)
    local user_id = res_body.claims.user_id
    ngx.var.user_id = user_id
+   ngx.req.set_header("user-id", user_id)
    return user_id
 end
 
