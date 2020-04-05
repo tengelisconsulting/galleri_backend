@@ -9,3 +9,7 @@
 
 
 - random, but I think the main mg2_handler should use a process pool executor to launch a loop per core
+
+
+- do a file upload from javascript
+- introduce two manager processes that manage each other and every part of the system

@@ -24,6 +24,7 @@ services:
       - LUA_CODE_CACHE
       - HTTP_ZMQ_HOST
       - HTTP_ZMQ_HTTP_PORT
+      - OBJ_BUFFER_SIZE
       - OBJ_STORAGE_HOST
       - OBJ_STORAGE_BUCKET
     volumes:

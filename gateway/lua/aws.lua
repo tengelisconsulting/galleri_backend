@@ -36,7 +36,7 @@ local function req_aws(obj_id, method, req_body)
       body = req_body,
       ssl_verify = false
    }
-   local aws_res, err = app_http.one_and_done(target_url, aws_req, 2000)
+   local aws_res, err = app_http.one_and_done(target_url, aws_req, 5000)
    if err then
       log.err("failed to handle req to aws - %s", err)
       return nil, 500
