@@ -25,13 +25,14 @@ services:
       - HTTP_ZMQ_HOST
       - HTTP_ZMQ_HTTP_PORT
       - OBJ_BUFFER_SIZE
+      - OBJ_MAX_SIZE
       - OBJ_STORAGE_HOST
       - OBJ_STORAGE_BUCKET
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
 
   mg2:
-    image: tengelisconsulting/http_zmq:latest
+    image: galleri/mg2:${MG2_VSN}
     network_mode: "host"
     environment:
       - PORT=${HTTP_ZMQ_HTTP_PORT}
@@ -73,6 +74,11 @@ services:
       - PGDB
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
+
+  redis:
+    image: redis:6.0-rc3-alpine
+    network_mode: "host"
+
 
   sys_postgrest:
     image: tengelisconsulting/postgrest:latest

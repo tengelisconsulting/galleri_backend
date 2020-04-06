@@ -20,6 +20,9 @@ local function get_obj(obj_type, obj_id)
 end
 
 local function put_obj(obj_type, obj_id)
+   -- you have to load the file to this server,
+   -- then upload it to aws yourself, after returning 200
+   -- on the original upload
    local init_url = string.format("/rpc/%s_create", obj_type)
    local delete_url = string.format("/rpc/%s_delete", obj_type)
    local update_url = string.format("/rpc/%s_update", obj_type)
@@ -37,10 +40,15 @@ local function put_obj(obj_type, obj_id)
       respond.die(500, "failed to init object record")
       return
    end
-   local aws_res, err_code = aws.req_aws(
-      obj_id, "PUT", downstream.get_body_string()
-   )
-   if err_code then
+   local req_body = downstream.get_body_string()
+   -- put the body into redis...
+   local upload_init_res = app_http.req_http_zmq({
+         method = "POST",
+         path = "/upload/obj-storage",
+         -- path = string.format("/upload/obj-storage/%s", obj_id),
+         body = cjson.encode(""),
+   })
+   if upload_init_res.err then
       log.err("failed to save object %s to storage - will remove record", obj_id)
       local del_res = app_http.req_sys_pgst({
             path = delete_url,
@@ -52,20 +60,10 @@ local function put_obj(obj_type, obj_id)
       if del_res.err then
          log.err("FAILED TO DELETE OBJECT %s - THIS OBJECT WILL EXIST IN STORAGE BUT IS NOT TRACKED", obj_id)
       end
-      respond.die(err_code, "obj storage failure")
+      respond.die(500, "obj storage failure")
       return
    end
-   local update_res = app_http.req_pub_pgst({
-         path = update_url,
-         method = "POST",
-         body = cjson.encode({
-               p_obj_id = obj_id,
-               p_href = aws.get_target_url(obj_id)
-         }),
-   })
-   if update_res.err then
-      log.err("failed to update href for object %s", obj_id)
-   end
+   -- update the href in the zmq handler
    respond.success(string.format("object %s created", obj_id))
 end
 

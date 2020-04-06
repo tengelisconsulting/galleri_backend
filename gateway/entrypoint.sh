@@ -13,6 +13,7 @@ main() {
 
     cp nginx/nginx.template.conf nginx/nginx.conf
     env_sub OBJ_BUFFER_SIZE
+    env_sub OBJ_MAX_SIZE
     env_sub GATEWAY_PORT
     env_sub PUB_PGST_HOST
     env_sub PUB_PGST_PORT
