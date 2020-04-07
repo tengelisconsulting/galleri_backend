@@ -84,10 +84,9 @@ def upload_redis(
         })
     )
     if not update_r:
-        err_s = f"{update_r.code} - {update_r.text}"
         logging.error(
-            "failed to update obj record - %s - %s",
-            update_r.status_code, update_r.text
+            "failed to update obj %s record - %s - %s",
+            obj_id, update_r.status_code, update_r.text
         )
         return
-    logging.info("obj record update success")
+    logging.info("obj record %s update success", odj_id)
