@@ -57,7 +57,6 @@ local function put_obj(obj_type, obj_id)
       return
    end
    local req_body = downstream.get_body_string()
-   -- put the body into redis...
    local res, redis_err = app_redis.set(obj_id, req_body)
    if redis_err then
       revert_record(obj_type, obj_id)
@@ -74,7 +73,6 @@ local function put_obj(obj_type, obj_id)
       revert_record(obj_type, obj_id)
       return
    end
-   -- update the href in the zmq handler
    respond.success(string.format("object %s created", obj_id))
 end
 

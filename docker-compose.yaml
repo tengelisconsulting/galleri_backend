@@ -119,5 +119,9 @@ services:
       - REDIS_PORT
       - Z_WORKER_ACK_PORT
       - Z_WORKER_PORT
+      - PUB_PGST_HOST
+      - PUB_PGST_PORT
+      - SYS_PGST_HOST
+      - SYS_PGST_PORT
     volumes:
       - "/etc/localtime:/etc/localtime:ro"

@@ -8,9 +8,6 @@ AS $$
 DECLARE
   v_user_id            UUID := session_user_id();
   v_obj_id             UUID := str_to_uuid(p_obj_id);
-  v_count              INTEGER;
-  v_href               image.href%TYPE;
-  v_description        image.description%TYPE;
   v_user_owns          BOOLEAN := check_owns(
     p_user_id           => v_user_id,
     p_obj_id            => v_obj_id
@@ -20,26 +17,11 @@ BEGIN
     RAISE insufficient_privilege;
   END IF;
 
-  SELECT COALESCE(p_href, href),
-         COALESCE(p_description, description)
-    INTO v_href,
-         v_description
-    FROM image
-   WHERE image_id = v_obj_id
-  ;
-
-  WITH updated AS (
-      UPDATE image
-         SET href = v_href,
-             description = v_description
-       WHERE image_id = v_obj_id
-    RETURNING *
-  )
-  SELECT count(*)
-    FROM updated
-    INTO v_count
-  ;
-  RETURN v_count;
+  RETURN sys.image_update(
+    p_obj_id            => p_obj_id,
+    p_href              => p_href,
+    p_description       => p_description
+  );
 END;
 $$
 LANGUAGE plpgsql

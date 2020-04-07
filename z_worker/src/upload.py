@@ -1,4 +1,5 @@
 from enum import Enum
+import json
 import logging
 import urllib.parse
 from typing import Callable
@@ -12,6 +13,8 @@ class ExitState(Enum):
     DO_NOTHING = 0
 
 
+PUB_POSTGREST_CON_S = f"http://{ENV.PUB_PGST_HOST}:{ENV.PUB_PGST_PORT}"
+SYS_POSTGREST_CON_S = f"http://{ENV.SYS_PGST_HOST}:{ENV.SYS_PGST_PORT}"
 HTTP_ZMQ_CON_S = f"http://{ENV.HTTP_ZMQ_HOST}:{ENV.HTTP_ZMQ_HTTP_PORT}"
 OBJ_STORAGE_ENDPOINT = f"{ENV.OBJ_STORAGE_HOST}/{ENV.OBJ_STORAGE_BUCKET}"
 
@@ -60,16 +63,31 @@ def upload_redis(
     headers = _get_aws_headers(app, obj_id)
     target_url = _get_target_url(obj_id)
     logging.debug("uploading %s to - %s", obj_id, target_url)
-    r = app.http_s.request(
+    upload_r = app.http_s.request(
         method = UPLOAD_METHOD,
         url = target_url,
         headers = headers,
         data = content
     )
-    if not r.ok:
-        err_s = f"{r.code} - {r.text}"
+    if not upload_r.ok:
         logging.error(
-            "failed to upload %s - %s", obj_id, err_s
+            "failed to update obj record - %s: %s - %s",
+            obj_id, upload_r.status_code, upload_r.text
         )
         return
     logging.info("upload %s success", obj_id)
+    update_r = app.http_s.post(
+        url=f"{SYS_POSTGREST_CON_S}/rpc/image_update",
+        data = json.dumps({
+            "p_obj_id": obj_id.decode("utf-8"),
+            "p_href": target_url
+        })
+    )
+    if not update_r:
+        err_s = f"{update_r.code} - {update_r.text}"
+        logging.error(
+            "failed to update obj record - %s - %s",
+            update_r.status_code, update_r.text
+        )
+        return
+    logging.info("obj record update success")
