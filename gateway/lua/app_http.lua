@@ -38,7 +38,7 @@ local function req(host, port, spec, timeout)
    if 200 <= res.status and res.status < 400 then
       err = nil
    else
-      err = "http return code not OK"
+      err = string.format("http return code not OK - %s", res.status)
    end
    return {
       status = res.status,

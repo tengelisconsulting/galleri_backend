@@ -23,7 +23,8 @@ main() {
 
     openresty -p `pwd`/ -c nginx/nginx.conf
 
-    tail -f logs/access.log -f logs/error.log
+    tail -f logs/*.log
+    # tail -f logs/access.log -f logs/error.log
 }
 
 

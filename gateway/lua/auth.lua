@@ -27,7 +27,7 @@ local function get_token(user_id, is_refresh)
          body = token_req_body,
    })
    if token_res.err then
-      return nil, "failed to create token"
+      return nil, token_res.err
    end
    local token = cjson.decode(token_res.body).token
    return token, nil
@@ -44,8 +44,10 @@ local function respond_new_session(user_id)
    end
    local session_token, err = get_token(user_id, false)
    if err then
-      ngx.log(ngx.ERR,
-              "failed to create session token for user id " .. user_id)
+      log.err(
+         "failed to create session token for user id %s - %s",
+         user_id, err
+      )
       fail(502, "failed to create session")
       return
    end

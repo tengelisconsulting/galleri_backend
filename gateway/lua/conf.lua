@@ -14,6 +14,8 @@ M.PUB_PGST_HOST = os.getenv("PUB_PGST_HOST")
 M.PUB_PGST_PORT = tonumber(os.getenv("PUB_PGST_PORT"))
 M.SYS_PGST_HOST = os.getenv("SYS_PGST_HOST")
 M.SYS_PGST_PORT = tonumber(os.getenv("SYS_PGST_PORT"))
+M.REDIS_HOST = os.getenv("REDIS_HOST")
+M.REDIS_PORT = tonumber(os.getenv("REDIS_PORT"))
 
 return M
 -- just don't rewrite these...

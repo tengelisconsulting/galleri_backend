@@ -1,6 +1,7 @@
 local cjson = require "cjson"
 
 local app_http = require "lua/app_http"
+local app_redis = require "lua/app_redis"
 local aws = require "lua/aws"
 local downstream = require "lua/downstream"
 local image = require "lua/image"
@@ -19,12 +20,27 @@ local function get_obj(obj_type, obj_id)
    ngx.say(res.body)
 end
 
+local function revert_record(obj_type, obj_id)
+   local delete_url = string.format("/rpc/%s_delete", obj_type)
+   log.err("failed to save object %s to storage - will remove record", obj_id)
+   local del_res = app_http.req_sys_pgst({
+         path = delete_url,
+         method = "POST",
+         body = cjson.encode({
+               p_obj_id = obj_id
+         }),
+   })
+   if del_res.err then
+      log.err("FAILED TO DELETE OBJECT %s - THIS OBJECT WILL EXIST IN STORAGE BUT IS NOT TRACKED", obj_id)
+   end
+   respond.die(500, "obj storage failure")
+end
+
 local function put_obj(obj_type, obj_id)
    -- you have to load the file to this server,
    -- then upload it to aws yourself, after returning 200
    -- on the original upload
    local init_url = string.format("/rpc/%s_create", obj_type)
-   local delete_url = string.format("/rpc/%s_delete", obj_type)
    local update_url = string.format("/rpc/%s_update", obj_type)
    local init_res = app_http.req_sys_pgst({
          path = init_url,
@@ -42,25 +58,20 @@ local function put_obj(obj_type, obj_id)
    end
    local req_body = downstream.get_body_string()
    -- put the body into redis...
+   local res, redis_err = app_redis.set(obj_id, req_body)
+   if redis_err then
+      revert_record(obj_type, obj_id)
+      return
+   end
    local upload_init_res = app_http.req_http_zmq({
          method = "POST",
          path = "/upload/obj-storage",
-         -- path = string.format("/upload/obj-storage/%s", obj_id),
-         body = cjson.encode(""),
+         body = cjson.encode({
+               obj_id = obj_id
+         }),
    })
    if upload_init_res.err then
-      log.err("failed to save object %s to storage - will remove record", obj_id)
-      local del_res = app_http.req_sys_pgst({
-            path = delete_url,
-            method = "POST",
-            body = cjson.encode({
-                  p_obj_id = obj_id
-            }),
-      })
-      if del_res.err then
-         log.err("FAILED TO DELETE OBJECT %s - THIS OBJECT WILL EXIST IN STORAGE BUT IS NOT TRACKED", obj_id)
-      end
-      respond.die(500, "obj storage failure")
+      revert_record(obj_type, obj_id)
       return
    end
    -- update the href in the zmq handler
