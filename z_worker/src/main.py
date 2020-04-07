@@ -17,23 +17,25 @@ from env import ENV
 import upload
 
 
+TASK_MAP = {
+    b"UPLOAD_REDIS" : (
+        upload.upload_redis, upload.cleanup
+    )
+}
+
+
 def parse_msg(
         app: App,
         msg
 )-> (Callable, str):
-    try:
-        sender_id, req_id, service_id, task_id, more, body = msg
-        if service_id != b"AD_HOC":
-            logging.error("unknown service id - %s", service_id)
-            return None, "unknown service id"
-        if task_id != b"UPLOAD_REDIS":
-            logging.error("unknown task id - %s", task_id)
-            return None, "unknown task id"
-        executor = lambda: upload.upload_redis(app, body)
-        return executor, None
-    except Exception as e:
-        logging.exception("failed to parse msg - %s", e)
-        return None, "failed to parse msg"
+    sender_id, req_id, service_id, task_id, more, body = msg
+    if service_id != b"AD_HOC":
+        raise Exception("unknown service id - %s" % service_id)
+    if task_id not in TASK_MAP:
+        raise Exception("unknown task id - %s" % task_id)
+    logging.info("recevied %s - %s", service_id, task_id)
+    cleanup, handler = TASK_MAP[task_id]
+    return cleanup, handler, body
 
 
 def listen_for_work(
@@ -41,17 +43,22 @@ def listen_for_work(
 )-> None:
     msg = app.pull.recv_multipart()
     logging.debug("recvd msg %s", msg)
-    executor, err = parse_msg(app, msg)
-    if err:
-        logging.error("giving up on message - %s", err)
+    handler, cleanup, body = None, None, None
+    try:
+        handler, cleanup, body = parse_msg(app, msg)
+        logging.debug("exec %s with body %s", handler, body)
+    except Exception as e:
+        logging.exception("failed parsing msg - %s", e)
         return
     try:
-        _result, err = executor()
-        if err:
-            logging.error("handler failed - %s", err)
-            return
+        exit_state = handler(app, body)
+        if exit_state is not None:
+            logging.error("handler failed with known state - %s.", exit_state)
+            logging.debug("attempt to rollback from state - %s", exit_state)
+            cleanup(exit_state)(app, body)
     except Exception as e:
-        logging.exception("failed handling msg - %s", e)
+        logging.exception("handler failed with unknown state - %s", e)
+        cleanup()(app, body)
 
 
 def start_handler_loop(app: App)-> None:

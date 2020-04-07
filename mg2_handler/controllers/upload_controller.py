@@ -15,8 +15,5 @@ def upload_obj_storage(
 )-> ResState:
     obj_id = request.read_body(req)["obj_id"]
     contents = req.app.r.get(obj_id)
-    logging.info(
-        "going to upload %s to aws... %s", obj_id, len(contents)
-    )
     msg.send_upload_redis(req.app, obj_id.encode("utf-8"))
     return response.ok("ok")
