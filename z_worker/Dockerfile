@@ -5,5 +5,5 @@ COPY ./requirements.txt ./requirements.txt
 RUN python3 -m pip install -r ./requirements.txt \
         && rm ./requirements.txt
 
-COPY ./main.py ./main.py
+COPY ./src .
 ENTRYPOINT [ "/app/main.py" ]

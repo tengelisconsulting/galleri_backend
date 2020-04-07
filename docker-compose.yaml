@@ -110,7 +110,11 @@ services:
     image: galleri/z_worker:${Z_WORKER_VSN}
     network_mode: "host"
     environment:
+      - HTTP_ZMQ_HOST
+      - HTTP_ZMQ_HTTP_PORT
       - MG2_HANDLER_HOST
+      - OBJ_STORAGE_HOST
+      - OBJ_STORAGE_BUCKET
       - REDIS_HOST
       - REDIS_PORT
       - Z_WORKER_ACK_PORT
