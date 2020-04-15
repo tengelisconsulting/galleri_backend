@@ -37,9 +37,6 @@ local function revert_record(obj_type, obj_id)
 end
 
 local function put_obj(obj_type, obj_id)
-   -- you have to load the file to this server,
-   -- then upload it to aws yourself, after returning 200
-   -- on the original upload
    local init_url = string.format("/rpc/%s_create", obj_type)
    local update_url = string.format("/rpc/%s_update", obj_type)
    local init_res = app_http.req_sys_pgst({

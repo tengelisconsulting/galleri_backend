@@ -89,4 +89,4 @@ def upload_redis(
             obj_id, update_r.status_code, update_r.text
         )
         return
-    logging.info("obj record %s update success", odj_id)
+    logging.info("obj record %s update success", obj_id)
