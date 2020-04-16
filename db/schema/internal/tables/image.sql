@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS image (
   user_id       UUID                      NOT NULL
     REFERENCES ac_user (user_id),
   description   TEXT,
+  thumb         BYTEA,
 
   PRIMARY KEY (image_id)
 );

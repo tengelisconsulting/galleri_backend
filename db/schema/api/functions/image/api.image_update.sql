@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION api.image_update(
   IN p_href             image.href%TYPE         DEFAULT NULL,
   IN p_description      image.description%TYPE  DEFAULT NULL
 )
-RETURNS INTEGER
+RETURNS JSON
 AS $$
 DECLARE
   v_user_id            UUID := session_user_id();
@@ -17,10 +17,12 @@ BEGIN
     RAISE insufficient_privilege;
   END IF;
 
-  RETURN sys.image_update(
-    p_obj_id            => p_obj_id,
-    p_href              => p_href,
-    p_description       => p_description
+  RETURN json_build_object(
+           'updated', sys.image_update(
+             p_obj_id            => p_obj_id,
+             p_href              => p_href,
+             p_description       => p_description
+           )
   );
 END;
 $$

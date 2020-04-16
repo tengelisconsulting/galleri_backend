@@ -14,12 +14,21 @@ from mg2.run import setup_logging
 from app import App
 from app import init as init_app
 from env import ENV
+from save_thumbnail import save_thumbnail
 import upload
+
+
+def upload_task(
+        app: App,
+        obj_id: bytes
+):
+    save_thumbnail(app, obj_id)
+    return upload.upload_redis(app, obj_id)
 
 
 TASK_MAP = {
     b"UPLOAD_REDIS" : (
-        upload.upload_redis, upload.cleanup
+        upload_task, upload.cleanup
     )
 }
 
@@ -34,8 +43,8 @@ def parse_msg(
     if task_id not in TASK_MAP:
         raise Exception("unknown task id - %s" % task_id)
     logging.info("recevied %s - %s", service_id, task_id)
-    cleanup, handler = TASK_MAP[task_id]
-    return cleanup, handler, body
+    handler, cleanup = TASK_MAP[task_id]
+    return handler, cleanup, body
 
 
 def listen_for_work(
