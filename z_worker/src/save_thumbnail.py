@@ -20,8 +20,14 @@ def save_thumbnail(
     image_bytes = app.r.get(obj_id)
     image_b_stream = io.BytesIO(image_bytes)
     orig = Image.open(image_b_stream)
-    smaller = orig.resize(_thumbnail_size())
-    smaller_bytes = smaller.tobytes()
+    smaller = orig.resize(_thumbnail_size(), Image.ANTIALIAS)
+    smaller_bytes: bytes
+    with io.BytesIO() as smaller_stream:
+        smaller.save(smaller_stream,
+                     format="JPEG",
+                     optimize=True,
+                     quality=50)
+        smaller_bytes = smaller_stream.getvalue()
     encoded = base64.b64encode(smaller_bytes)
     url = f"http://{ENV.SYS_PGST_HOST}:{ENV.SYS_PGST_PORT}/rpc/image_update"
     with requests.Session() as s:

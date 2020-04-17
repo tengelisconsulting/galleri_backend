@@ -23,7 +23,8 @@ def upload_task(
         obj_id: bytes
 ):
     save_thumbnail(app, obj_id)
-    return upload.upload_redis(app, obj_id)
+    return upload.ExitState.DO_NOTHING
+    # return upload.upload_redis(app, obj_id)
 
 
 TASK_MAP = {
@@ -61,10 +62,10 @@ def listen_for_work(
         return
     try:
         exit_state = handler(app, body)
-        if exit_state is not None:
-            logging.error("handler failed with known state - %s.", exit_state)
-            logging.debug("attempt to rollback from state - %s", exit_state)
-            cleanup(exit_state)(app, body)
+        logging.info("handler exited with known state - %s.", exit_state)
+        cleanup_fn = cleanup(exit_state)
+        logging.debug("cleanup handler: %s", cleanup_fn)
+        cleanup_fn(app, body)
     except Exception as e:
         logging.exception("handler failed with unknown state - %s", e)
         cleanup()(app, body)

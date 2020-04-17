@@ -46,7 +46,7 @@ def _delete_redis_key(
 def cleanup(
         exit_state: ExitState = None
 )-> Callable:
-    def do_noting(_app, _body):
+    def do_nothing(_app, _body):
         return None
     if exit_state == ExitState.DO_NOTHING:
         return do_nothing
