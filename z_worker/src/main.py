@@ -23,8 +23,7 @@ def upload_task(
         obj_id: bytes
 ):
     save_thumbnail(app, obj_id)
-    return upload.ExitState.DO_NOTHING
-    # return upload.upload_redis(app, obj_id)
+    return upload.upload_redis(app, obj_id)
 
 
 TASK_MAP = {

@@ -13,6 +13,7 @@ from env import ENV
 def _thumbnail_size():
     return (404, 250)
 
+
 def save_thumbnail(
         app: App,
         obj_id: bytes

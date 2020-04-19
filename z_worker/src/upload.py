@@ -41,6 +41,7 @@ def _delete_redis_key(
 )-> None:
     logging.debug("deleting %s from redis", obj_id)
     app.r.delete(obj_id)
+    return
 
 
 def cleanup(

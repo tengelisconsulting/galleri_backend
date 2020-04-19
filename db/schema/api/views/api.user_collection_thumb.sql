@@ -3,7 +3,7 @@ AS
   SELECT ic.collection_id,
          ic.collection_name,
          im.image_id,
-         encode(im.thumb, 'base64') thumb_b64
+         im.thumb
     FROM image_collection ic
     JOIN image_collection_image ici
       ON ici.collection_id = ic.collection_id
@@ -15,5 +15,5 @@ AS
                         )
     JOIN image im
       ON ici.image_id = im.image_id
-   -- WHERE ic.user_id = session_user_id()
+   WHERE ic.user_id = session_user_id()
 ;
