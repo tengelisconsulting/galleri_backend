@@ -32,7 +32,7 @@ def get_aws_headers(
     })
 
 
-@req_mapping(path="/aws/access-url", method="GET")
+@req_mapping(path="/aws-url/access/read", method="GET")
 def get_access_url(
         req_state: ReqState
 )-> ResState:
@@ -45,3 +45,18 @@ def get_access_url(
     return response.ok({
         "url_b64": encoded_url,
     })
+
+
+# @req_mapping(path="/aws-url/access/create", method="GET")
+# def get_access_url(
+#         req_state: ReqState
+# )-> ResState:
+#     q_params = parse_qs(req_state.req.headers['QUERY'])
+#     obj_id = q_params["objId"][0]
+#     url = s3.get_presigned_url(
+#         req_state.app, obj_id, ENV.AWS_GET_URL_LIFETIME_S
+#     )
+#     encoded_url = base64.b64encode(url.encode("utf-8")).decode("utf-8")
+#     return response.ok({
+#         "url_b64": encoded_url,
+#     })

@@ -108,6 +108,10 @@ local function req_http_zmq(spec)
    return req(conf.HTTP_ZMQ_HOST, conf.HTTP_ZMQ_PORT, spec)
 end
 
+local function proxy_http_zmq(spec)
+   return proxy_request(conf.HTTP_ZMQ_HOST, conf.HTTP_ZMQ_PORT, spec)
+end
+
 local function proxy_pub_pgst(changes)
    changes.headers = {}
    changes.headers["user-id"] = ngx.var.user_id
@@ -122,6 +126,7 @@ end
 
 local M = {}
 M.one_and_done = one_and_done
+M.proxy_http_zmq = proxy_http_zmq
 M.proxy_pub_pgst = proxy_pub_pgst
 M.proxy_sys_pgst = proxy_sys_pgst
 M.proxy_request = proxy_request

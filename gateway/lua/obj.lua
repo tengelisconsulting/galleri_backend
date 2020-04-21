@@ -132,7 +132,15 @@ local function access_obj(obj_type, obj_id)
    ngx.exit(405)
 end
 
+local function get_access_url(obj_id, access_op)
+   return app_http.proxy_http_zmq({
+         method = "GET",
+         path = "/aws-url/access/" .. access_op .. "?objId=" .. obj_id,
+   })
+end
+
 
 local M = {}
 M.access_obj = access_obj
+M.get_access_url = get_access_url
 return M
