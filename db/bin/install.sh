@@ -1,10 +1,12 @@
 #!/bin/sh
 
+bin_dir=$(dirname "$(readlink -f "$0")")
+DEF_BASE_DIR=${bin_dir}/../schema
 
-if [ "${DEF_BASE_DIR}" = "" ]; then
-    echo "supply DEF_BASE_DIR"
-    exit 1
-fi
+# if [ "${DEF_BASE_DIR}" = "" ]; then
+#     echo "supply DEF_BASE_DIR"
+#     exit 1
+# fi
 
 execute_all_sql_at_root() {
     if [ ! -d "${1}" ]; then

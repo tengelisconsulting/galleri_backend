@@ -47,6 +47,7 @@ services:
     image: galleri/mg2_handler:${MG2_HANDLER_VSN}
     network_mode: "host"
     environment:
+      - AWS_GET_URL_LIFETIME_S
       - MG2_HANDLER_HOST
       - MG_HOST=${HTTP_ZMQ_HOST}
       - MG_WORK_PORT=${HTTP_ZMQ_WORK_PORT}
@@ -57,6 +58,8 @@ services:
       - AWS_SECRET_KEY
       - REDIS_HOST
       - REDIS_PORT
+      - OBJ_STORAGE_BUCKET
+      - OBJ_STORAGE_REGION
       - Z_WORKER_ACK_PORT
       - Z_WORKER_PORT
     volumes:

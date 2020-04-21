@@ -10,6 +10,7 @@ RUN python3 -m pip install ./galleri \
 
 WORKDIR /app
 COPY ./controllers ./controllers
+COPY ./init.py ./init.py
 COPY ./main.py ./main.py
 
 ENV CONTROLLER_DEF_DIR "/app/controllers"

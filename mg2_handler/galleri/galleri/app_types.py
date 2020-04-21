@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 from typing import Tuple
 
+import boto3
 import redis
 import zmq
 
@@ -21,6 +22,7 @@ class WorkSender(SimpleNamespace):
 
 class App(SimpleNamespace):
     ps_id: str
+    s3: boto3.client
     c: zmq.Context
     r: redis.Redis
     ws: WorkSender
