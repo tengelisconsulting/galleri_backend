@@ -7,10 +7,10 @@ local log = require "lua/log"
 
 
 local function do_test()
-   app_cors.set_cors_headers()
-   local body = downstream.get_body_string()
-   log.info("req body: %s", body)
-   ngx.say(cjson.encode("hey"))
+   -- app_cors.set_cors_headers()
+   -- local body = downstream.get_body_string()
+   -- log.info("req body: %s", body)
+   -- ngx.say(cjson.encode("hey"))
 end
 
 local M = {}

@@ -16,7 +16,6 @@ services:
     network_mode: "host"
     environment:
       - GATEWAY_PORT
-      - ALLOWED_ORIGIN
       - PUB_PGST_HOST
       - PUB_PGST_PORT
       - SYS_PGST_HOST
