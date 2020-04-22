@@ -1,4 +1,3 @@
-import base64
 import logging
 from urllib.parse import parse_qs
 from urllib.parse import unquote as url_unquote
@@ -41,10 +40,7 @@ def get_read_url(
     url = s3.get_access_url(
         req_state.app, obj_id, ENV.AWS_GET_URL_LIFETIME_S
     )
-    encoded_url = base64.b64encode(url.encode("utf-8")).decode("utf-8")
-    return response.ok({
-        "url_b64": url,
-    })
+    return response.ok(url)
 
 
 @req_mapping(path="/aws-url/access/create", method="GET")
@@ -65,7 +61,7 @@ def get_delete_url(
 )-> ResState:
     q_params = parse_qs(req_state.req.headers['QUERY'])
     obj_id = q_params["objId"][0]
-    res = s3.get_delete_url(
+    url = s3.get_delete_url(
         req_state.app, obj_id, ENV.AWS_GET_URL_LIFETIME_S
     )
-    return response.ok(res)
+    return response.ok(url)
