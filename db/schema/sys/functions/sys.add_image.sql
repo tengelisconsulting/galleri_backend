@@ -1,8 +1,0 @@
--- CREATE OR REPLACE FUNCTION sys.add_image(
---   IN p_obj_id     UUID
--- )
--- RETURNS BOOLEAN
--- AS $$
--- $$
--- LANGUAGE plpgsql
--- ;

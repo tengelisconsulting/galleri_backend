@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION sys.image_create(
   IN p_user_id          image.user_id%TYPE,
-  IN p_obj_id           image.image_id%TYPE
+  IN p_image_id         image.image_id%TYPE
 )
 RETURNS BOOLEAN
 AS $$
@@ -11,7 +11,7 @@ BEGIN
               )
        VALUES (
                 p_user_id,
-                p_obj_id
+                p_image_id
               )
   ;
   RETURN TRUE;

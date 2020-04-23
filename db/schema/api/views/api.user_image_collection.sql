@@ -1,4 +1,5 @@
 CREATE OR REPLACE VIEW api.user_image_collection
+-- all the user's collections, no thumb
 AS
   SELECT ic.collection_id,
          ic.collection_name,

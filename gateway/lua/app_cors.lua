@@ -3,8 +3,6 @@ local log = require "lua/log"
 
 
 local function set_cors_headers()
-   log.info("origin: %s", ngx.var.http_origin);
-   log.info(ngx.var.scheme);
    if ngx.req.get_method() == "OPTIONS" then
       ngx.header["Access-Control-Allow-Credentials"] = "true"
       ngx.header["Access-Control-Allow-Origin"] = ngx.var.http_origin;

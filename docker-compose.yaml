@@ -59,8 +59,6 @@ services:
       - REDIS_PORT
       - OBJ_STORAGE_BUCKET
       - OBJ_STORAGE_REGION
-      - Z_WORKER_ACK_PORT
-      - Z_WORKER_PORT
     volumes:
       - ${PRIV_KEY_FILE}:/app/priv_key:ro
       - "/etc/localtime:/etc/localtime:ro"
@@ -84,9 +82,9 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
 
-  redis:
-    image: redis:6.0-rc3-alpine
-    network_mode: "host"
+  # redis:
+  #   image: redis:6.0-rc3-alpine
+  #   network_mode: "host"
 
 
   sys_postgrest:

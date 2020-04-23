@@ -24,5 +24,3 @@ class App(SimpleNamespace):
     ps_id: str
     s3: boto3.client
     c: zmq.Context
-    r: redis.Redis
-    ws: WorkSender
