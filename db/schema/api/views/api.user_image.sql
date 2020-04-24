@@ -3,11 +3,14 @@ CREATE OR REPLACE VIEW api.user_image
 AS
   WITH collection_image AS (
     SELECT ic.collection_id,
-           unnest(ic.images) image_id
-      FROM image_collection ic
+           im.image_id,
+           im.ordinal
+      FROM image_collection ic,
+      unnest(ic.images) WITH ordinality AS im(image_id, ordinal)
      WHERE ic.user_id = session_user_id()
   )
   SELECT im.image_id,
+         ci.ordinal,
          ci.collection_id,
          im.created,
          im.user_id,
