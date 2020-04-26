@@ -58,7 +58,6 @@ local function respond_new_session(user_id)
       fail(502, "failed to create session")
       return
    end
-
    local ok, err = app_cookie.set({
          key = REFRESH_TOKEN_NAME,
          value = refresh_token,
@@ -71,7 +70,8 @@ local function respond_new_session(user_id)
       return
    end
    local res = cjson.encode({
-         session_token = session_token
+         session_token = session_token,
+         user_id = user_id,
    })
    ngx.say(res)
 end
