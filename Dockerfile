@@ -1,1 +1,2 @@
-FROM alpine:latest
+FROM busybox
+RUN ls
