@@ -72,11 +72,6 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
 
-  # redis:
-  #   image: redis:6.0-rc3-alpine
-  #   network_mode: "host"
-
-
   sys_postgrest:
     image: tengelisconsulting/postgrest:latest
     network_mode: "host"

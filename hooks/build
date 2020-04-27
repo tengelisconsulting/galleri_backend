@@ -10,6 +10,8 @@ do_build() {
     full_image_name=galleri/${image_name}:${TAG}
     docker build -t ${full_image_name} ./${build_dir}
     docker push ${full_image_name}
+    docker tag ${full_image_name} galleri/${image_name}:latest
+    docker push galleri/${image_name}:latest
 }
 
 do_build gateway gateway
