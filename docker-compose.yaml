@@ -1,16 +1,6 @@
 version: "3.4"
 services:
 
-  db:
-    image: postgres:12.2
-    network_mode: "host"
-    environment:
-      - POSTGRES_USER=${PGUSER}
-      - POSTGRES_PASSWORD=${PGPASSWORD}
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "${DB_DIRNAME}:/var/lib/postgresql/data"
-
   gateway:
     image: galleri/gateway:${GATEWAY_VSN}
     network_mode: "host"
