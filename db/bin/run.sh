@@ -4,8 +4,8 @@
 docker run -d \
        --rm \
        --net=host \
-       -e POSTGREST_USER=${PGUSER} \
-       -e POSTGREST_PASSWORD=${PGPASSWORD} \
+       -e POSTGRES_USER=${PGUSER} \
+       -e POSTGRES_PASSWORD=${PGPASSWORD} \
        -v "/etc/localtime:/etc/localtime:ro" \
        -v "${DB_DIRNAME}:/var/lib/postgresql/data" \
        --name galleri_db \

@@ -1,7 +1,7 @@
 CREATE OR REPLACE VIEW sys.user_permission
 AS
   SELECT u.user_id,
-         u.username,
+         u.username_upper,
          p.permission_id,
          p.permission_code
     FROM ac_user u
