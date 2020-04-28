@@ -120,6 +120,15 @@ local function authenticate_username_password()
    return respond_new_session(user_id)
 end
 
+local function end_session()
+   local ok, err = app_cookie.set({
+         key = REFRESH_TOKEN_NAME,
+         value = "",
+         path = "/",
+         http_only = true,
+   })
+   ngx.say(cjson.encode("ok"))
+end
 
 local function renew_session()
    local refresh_token, err = app_cookie.get(REFRESH_TOKEN_NAME)
@@ -217,6 +226,7 @@ end
 -- module
 local M = {}
 M.authenticate_username_password = authenticate_username_password
+M.end_session = end_session
 M.init_user = init_user
 M.renew_session = renew_session
 M.authenticate_req = authenticate_req
