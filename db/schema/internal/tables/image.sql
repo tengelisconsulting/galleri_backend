@@ -7,10 +7,7 @@ CREATE TABLE IF NOT EXISTS image (
   user_id       UUID                      NOT NULL
     REFERENCES ac_user (user_id),
   permissions   JSON                      NOT NULL
-    DEFAULT json_build_object(
-              'owner', 'rw',
-              'other', 'r'
-            ),
+    DEFAULT default_permissions(),
   description   TEXT,
   thumb         BYTEA,
 

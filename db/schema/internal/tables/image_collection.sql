@@ -6,10 +6,7 @@ CREATE TABLE IF NOT EXISTS image_collection (
   user_id           UUID                NOT NULL
     REFERENCES ac_user (user_Id),
   permissions   JSON                      NOT NULL
-    DEFAULT json_build_object(
-              'owner', 'rw',
-              'other', 'r'
-            ),
+    DEFAULT default_permissions(),
   collection_name   TEXT                NOT NULL,
   images            UUID[]              NOT NULL
     CHECK (array_length(images, 1) > 0),
