@@ -26,7 +26,7 @@ BEGIN
 
   SELECT images
     INTO v_images
-    FROM image_collection
+    FROM public.image_collection
    WHERE collection_id = v_collection_id
   ;
   v_images := v_images || v_image_id;

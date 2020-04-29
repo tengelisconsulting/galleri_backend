@@ -18,18 +18,18 @@ BEGIN
 
   SELECT images
     INTO v_images
-    FROM image_collection
+    FROM public.image_collection
    WHERE collection_id = v_collection_id
   ;
 
   FOR i IN array_lower(v_images, 1)..array_upper(v_images, 1) LOOP
-    DELETE FROM image
+    DELETE FROM public.image
           WHERE image_id = v_images[i]
     ;
     v_deleted := v_deleted + 1;
   END LOOP;
 
-  DELETE FROM image_collection
+  DELETE FROM public.image_collection
         WHERE collection_id = v_collection_id
   ;
   v_deleted := v_deleted + 1;

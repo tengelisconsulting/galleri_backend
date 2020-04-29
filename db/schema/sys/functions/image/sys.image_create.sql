@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION sys.image_create(
 RETURNS BOOLEAN
 AS $$
 BEGIN
-  INSERT INTO image (
+  INSERT INTO public.image (
                 user_id,
                 image_id
               )

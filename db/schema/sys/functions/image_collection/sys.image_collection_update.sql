@@ -11,7 +11,7 @@ DECLARE
   v_updated             INTEGER := 0;
 BEGIN
   IF p_collection_name IS NOT NULL THEN
-    UPDATE image_collection
+    UPDATE public.image_collection
        SET collection_name = p_collection_name
      WHERE collection_id = p_collection_id
     ;
@@ -28,14 +28,14 @@ BEGIN
   FOREACH v_image_id IN ARRAY p_images LOOP
     SELECT TRUE
       INTO v_image_exists
-      FROM image
+      FROM public.image
      WHERE image_id = v_image_id
     ;
     IF v_image_exists IS NULL THEN
       RAISE EXCEPTION 'Nonexistent Image ID --> %', v_image_id;
     END IF;
   END LOOP;
-  UPDATE image_collection
+  UPDATE public.image_collection
      SET images = p_images
    WHERE collection_id = p_collection_id
   ;

@@ -19,12 +19,12 @@ BEGIN
     INTO v_href,
          v_description,
          v_thumb
-    FROM image
+    FROM public.image
    WHERE image_id = v_obj_id
   ;
 
   WITH updated AS (
-      UPDATE image
+      UPDATE public.image
          SET href = v_href,
              description = v_description,
              thumb = v_thumb

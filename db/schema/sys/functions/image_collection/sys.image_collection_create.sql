@@ -16,14 +16,14 @@ BEGIN
   FOREACH v_image_id IN ARRAY p_images LOOP
     SELECT TRUE
       INTO v_image_exists
-      FROM image
+      FROM public.image
      WHERE image_id = v_image_id
     ;
     IF v_image_exists IS NULL THEN
       RAISE EXCEPTION 'Nonexistent Image ID --> %', v_image_id;
     END IF;
   END LOOP;
-  INSERT INTO image_collection (
+  INSERT INTO public.image_collection (
                 user_id,
                 collection_id,
                 collection_name,

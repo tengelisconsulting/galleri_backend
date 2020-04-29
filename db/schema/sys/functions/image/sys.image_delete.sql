@@ -7,7 +7,7 @@ DECLARE
   v_count       INTEGER;
 BEGIN
   WITH deleted AS (
-  DELETE FROM image
+  DELETE FROM public.image
         WHERE image_id = p_obj_id
     RETURNING *
   )

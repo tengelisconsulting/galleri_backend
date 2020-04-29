@@ -26,11 +26,11 @@ BEGIN
 
   SELECT images
     INTO v_images
-    FROM image_collection
+    FROM public.image_collection
    WHERE collection_id = v_collection_id
   ;
   v_images := array_remove(v_images, v_image_id);
-  UPDATE image_collection
+  UPDATE public.image_collection
      SET images = v_images
    WHERE collection_id = v_collection_id
   ;

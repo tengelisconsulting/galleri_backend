@@ -17,7 +17,7 @@ BEGIN
   END IF;
 
   WITH deleted AS (
-    DELETE FROM image
+    DELETE FROM public.image
           WHERE image_id = v_image_id
             AND user_id = v_user_id
       RETURNING image_id
