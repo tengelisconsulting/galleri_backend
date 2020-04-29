@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW api.image_collection
+CREATE OR REPLACE VIEW api.image_collection_public
 AS
   SELECT ic.collection_id,
          ic.user_id,
@@ -9,4 +9,5 @@ AS
     FROM image_collection ic
     JOIN ac_user u
       ON u.user_id = ic.user_id
+   WHERE ic.permissions->'public'->>'r' = 't'
 ;
