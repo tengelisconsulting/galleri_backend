@@ -9,11 +9,13 @@ DECLARE
 BEGIN
   INSERT INTO ac_user (
                 user_id,
+                username,
                 username_upper,
                 password_hash
               )
        VALUES (
                 v_user_id,
+                p_username,
                 upper(p_username),
                 crypt(p_password, gen_salt('bf'))
               )
