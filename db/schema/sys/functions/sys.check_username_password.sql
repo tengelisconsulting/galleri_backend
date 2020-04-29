@@ -14,7 +14,7 @@ BEGIN
       INTO v_pw_hash,
            v_user_id
       FROM ac_user
-     WHERE username = p_username
+     WHERE username_upper = upper(p_username)
     ;
     EXCEPTION
       WHEN NO_DATA_FOUND THEN
