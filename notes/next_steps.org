@@ -1,15 +1,8 @@
-* performance tests
-  - concurrent logins
-  - concurrent session renews
-  ...
-  - concurrent permission checks
+-- write a majordomo broker in Elixir, get rid of mongerl2
 
-- outline interaction with the DO spaces API -
-  - I believe you should be able to proxy the request to DO and add the appropriate headers after you've done auth in openresty
+-- upgrade backend services on docker hub build, same way as the webapp
 
-
-- random, but I think the main mg2_handler should use a process pool executor to launch a loop per core
-
-
-- do a file upload from javascript
-- introduce two manager processes that manage each other and every part of the system
+-- run a DB upgrade on docker hub build.
+  What this could look like is a docker image running a python / shell script.
+  You need some kind of 'version' associated with the schema state, and a digraph of what scripts to execute
+  in order to bring the schema up to the desired state.
