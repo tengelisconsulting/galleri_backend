@@ -19,6 +19,7 @@ services:
       - OBJ_STORAGE_BUCKET
       - REDIS_HOST
       - REDIS_PORT
+    restart: unless-stopped
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
 
@@ -29,6 +30,7 @@ services:
       - PORT=${HTTP_ZMQ_HTTP_PORT}
       - SEND_PORT=${HTTP_ZMQ_WORK_PORT}
       - RECV_PORT=${HTTP_ZMQ_RESP_PORT}
+    restart: unless-stopped
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
 
@@ -49,6 +51,7 @@ services:
       - REDIS_PORT
       - OBJ_STORAGE_BUCKET
       - OBJ_STORAGE_REGION
+    restart: unless-stopped
     volumes:
       - ${PRIV_KEY_FILE}:/app/priv_key:ro
       - "/etc/localtime:/etc/localtime:ro"
@@ -69,6 +72,7 @@ services:
       - PGHOST
       - PGPORT
       - PGDB
+    restart: unless-stopped
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
 
@@ -88,5 +92,6 @@ services:
       - PGHOST
       - PGPORT
       - PGDB
+    restart: unless-stopped
     volumes:
       - "/etc/localtime:/etc/localtime:ro"

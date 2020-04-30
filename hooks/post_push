@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker run --rm --net=host -e TARGET_URL=${BUILD_HOOK_ENDPOINT}/build-success/galleri_backend -e HOOK_KEY=${HOOK_KEY} -e ACTION=restart_compose_service tengelisconsulting/docker-hub-hooks
