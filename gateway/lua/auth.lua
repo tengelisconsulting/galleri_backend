@@ -84,7 +84,6 @@ local function init_user()
          p_password = data.password,
          p_role_names = cjson.empty_array,
    })
-   ngx.log(ngx.NOTICE, req_body)
    app_http.proxy_sys_pgst({
          path = "/rpc/ac_init_user",
          method = "POST",
@@ -203,9 +202,6 @@ local function authenticate_req()
 end
 
 local function authorize_obj_access(user_id, obj_id, access_op)
-   log.info("userId %s", user_id)
-   log.info("objId %s", obj_id)
-   log.info("access op ---%s---", access_op)
    local perm_res = app_http.req_pub_pgst({
          path = string.format("/obj_op_permitted?obj_id=eq.%s", obj_id),
          method = "GET",
