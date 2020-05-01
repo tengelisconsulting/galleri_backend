@@ -11,7 +11,7 @@ DECLARE
 BEGIN
     SELECT 1
       INTO v_obj_exists
-      FROM user_owner
+      FROM obj_permissions
      WHERE obj_id = p_obj_id
   GROUP BY obj_id
   ;
@@ -21,7 +21,7 @@ BEGIN
 
   SELECT true
     INTO v_is_owner
-    FROM user_owner
+    FROM obj_permissions
    WHERE owner_id = p_user_id
      AND obj_id = p_obj_id
   ;
