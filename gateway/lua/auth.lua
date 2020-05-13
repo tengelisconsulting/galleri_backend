@@ -5,6 +5,7 @@ local app_http = require "lua/app_http"
 local downstream = require "lua/downstream"
 local log = require "lua/log"
 local respond = require "lua/respond"
+local ez = require "lua/ez"
 
 local REFRESH_TOKEN_NAME = "galleri_refresh_token"
 local TOKEN_CAPTURE = "Bearer: (.*)"
@@ -18,43 +19,29 @@ local function get_token(user_id, is_refresh)
       end
       return "/token/new/session"
    end
-   local token_req_body = cjson.encode({
-         user_id = user_id
-   })
-   local token_res = app_http.req_http_zmq({
-         path = get_path(),
-         method = "POST",
-         body = token_req_body,
-   })
-   if token_res.err then
-      return nil, token_res.err
+   local token_res, err = ez.r("AUTH", get_path(), {user_id = user_id})
+   if err then
+      return nil, err
    end
-   local token = cjson.decode(token_res.body).token
-   return token, nil
+   return token_res.token, nil
 end
 
 
 local function respond_new_session(user_id)
    local function fail(status, err_msg)
       ngx.status = status
-      local res = cjson.encode({
-            err = err_msg
-      })
+      local res = cjson.encode({err = err_msg})
       ngx.say(res)
    end
    local session_token, err = get_token(user_id, false)
    if err then
-      log.err(
-         "failed to create session token for user id %s - %s",
-         user_id, err
-      )
+      log.err("failed to create session token for user id %s - %s", user_id, err)
       fail(502, "failed to create session")
       return
    end
    local refresh_token, err_ref = get_token(user_id, true)
    if err then
-      ngx.log(ngx.ERR,
-              "failed to create refresh token for user id " .. user_id)
+      log.err("failed to create refresh token for user id %s", user_id)
       fail(502, "failed to create session")
       return
    end
@@ -65,7 +52,7 @@ local function respond_new_session(user_id)
          http_only = true,
    })
    if not ok then
-      ngx.log(ngx.ERR, err)
+      log.err(err)
       fail(500, "failed creating session")
       return
    end
@@ -138,23 +125,19 @@ local function renew_session()
       })
       ngx.say(res)
    end
-   local session_res = app_http.req_http_zmq({
-         path = "/token/parse",
-         method = "POST",
-         body = cjson.encode({
-               token = refresh_token,
-               is_refresh = true,
-         }),
+   local session_res, err = ez.r("AUTH", "/token/parse", {
+                                    token = refresh_token,
+                                    is_refresh = true,
    })
-   if session_res.err then
-      ngx.log(ngx.ERR, session_res.err)
+   if err then
+      ngx.log(ngx.ERR, err)
       ngx.status = 401
       ngx.say(cjson.encode({
                     err = "invalid refresh token"
       }))
       return
    end
-   local claims = cjson.decode(session_res.body).claims
+   local claims = session_res.claims
    return respond_new_session(claims.user_id)
 end
 
@@ -182,20 +165,16 @@ local function authenticate_req()
       return
    end
    -- get user id from token
-   local session_res = app_http.req_http_zmq({
-         path = "/token/parse",
-         method = "POST",
-         body = cjson.encode({
-               token = token,
-               is_refresh = false,
-         }),
+   local session_res, err = ez.r("AUTH", "/token/parse", {
+                                    token = token,
+                                    is_refresh = false
    })
-   if session_res.err then
+   log.err("ERROR %s", err)
+   if err then
       authenticate_fail("token verification failed")
       return
    end
-   local res_body = cjson.decode(session_res.body)
-   local user_id = res_body.claims.user_id
+   local user_id = session_res.claims.user_id
    ngx.var.user_id = user_id
    ngx.req.set_header("user-id", user_id)
    return user_id

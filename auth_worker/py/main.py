@@ -35,6 +35,7 @@ async def handler(
     # structure of req is [ cmd: str, args: json ].  Args must be dict.
     # structure of res is [ ok: b"OK" or b"ERR", body: json ]
     # if res is b"ERR", the body should be an http status code (as bytes)
+    logging.debug("frames: %s", frames)
     cmd = frames[0]
     if cmd not in ROUTES:
         return (None, [b"ERR", b"404"])
