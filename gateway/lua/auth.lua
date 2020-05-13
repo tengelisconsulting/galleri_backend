@@ -132,9 +132,7 @@ local function renew_session()
    if err then
       ngx.log(ngx.ERR, err)
       ngx.status = 401
-      ngx.say(cjson.encode({
-                    err = "invalid refresh token"
-      }))
+      ngx.say(cjson.encode({err = "invalid refresh token"}))
       return
    end
    local claims = session_res.claims

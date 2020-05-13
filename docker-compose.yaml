@@ -137,7 +137,7 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
 
   auth_worker:
-    image: tengelisconsulting/auth_worker:latest
+    image: galleri/auth_worker:latest
     network_mode: "host"
     environment:
       - LOG_LEVEL

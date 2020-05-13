@@ -15,8 +15,7 @@ do_build() {
 }
 
 do_build gateway gateway
-do_build mg2 mg2
-do_build mg2_handler mg2_handler
+do_build auth_worker auth_worker
 
 # to make dockerhub happy
 docker build -t tengelisconsulting/galleri_backend:latest .
