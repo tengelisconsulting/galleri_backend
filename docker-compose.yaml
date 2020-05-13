@@ -65,37 +65,6 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
 
-  # mg2:
-  #   image: galleri/mg2:${MG2_VSN}
-  #   network_mode: "host"
-  #   environment:
-  #     - PORT=${HTTP_ZMQ_HTTP_PORT}
-  #     - SEND_PORT=${HTTP_ZMQ_WORK_PORT}
-  #     - RECV_PORT=${HTTP_ZMQ_RESP_PORT}
-  #   restart: unless-stopped
-  #   volumes:
-  #     - "/etc/localtime:/etc/localtime:ro"
-
-  # mg2_handler:
-  #   image: galleri/mg2_handler:${MG2_HANDLER_VSN}
-  #   network_mode: "host"
-  #   environment:
-  #     - AWS_GET_URL_LIFETIME_S
-  #     - MG2_HANDLER_HOST
-  #     - MG_HOST=${HTTP_ZMQ_HOST}
-  #     - MG_WORK_PORT=${HTTP_ZMQ_WORK_PORT}
-  #     - MG_RESP_PORT=${HTTP_ZMQ_RESP_PORT}
-  #     - SESSION_TIMEOUT_S
-  #     - LOG_LEVEL
-  #     - AWS_ACCESS_KEY_ID
-  #     - AWS_SECRET_KEY
-  #     - OBJ_STORAGE_BUCKET
-  #     - OBJ_STORAGE_REGION
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ${PRIV_KEY_FILE}:/app/priv_key:ro
-  #     - "/etc/localtime:/etc/localtime:ro"
-
   pub_postgrest:
     image: tengelisconsulting/postgrest:latest
     network_mode: "host"
@@ -140,12 +109,33 @@ services:
     image: galleri/auth_worker:latest
     network_mode: "host"
     environment:
+      # generic
+      - SERVICE_NAME=AUTH
       - LOG_LEVEL
       - LISTEN_HOST=${EZ_PIPE_HOST}
       - PORT=${EZ_WORKER_PORT_A}
-      - SERVICE_NAME=AUTH
+      # impl
       - SESSION_TIMEOUT_S
     restart: "unless-stopped"
     volumes:
       - ${PRIV_KEY_FILE}:/app/priv_key:ro
+      - "/etc/localtime:/etc/localtime:ro"
+
+  aws_worker:
+    image: galleri/aws_worker:latest
+    network_mode: "host"
+    environment:
+      # generic
+      - SERVICE_NAME=AWS
+      - LOG_LEVEL
+      - LISTEN_HOST=${EZ_PIPE_HOST}
+      - PORT=${EZ_WORKER_PORT_A}
+      # specific
+      - AWS_ACCESS_KEY_ID
+      - AWS_GET_URL_LIFETIME_S
+      - AWS_SECRET_KEY
+      - OBJ_STORAGE_BUCKET
+      - OBJ_STORAGE_REGION
+    restart: "unless-stopped"
+    volumes:
       - "/etc/localtime:/etc/localtime:ro"

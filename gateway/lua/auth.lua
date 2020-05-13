@@ -167,7 +167,6 @@ local function authenticate_req()
                                     token = token,
                                     is_refresh = false
    })
-   log.err("ERROR %s", err)
    if err then
       authenticate_fail("token verification failed")
       return
