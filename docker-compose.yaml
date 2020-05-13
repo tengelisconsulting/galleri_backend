@@ -143,6 +143,7 @@ services:
       - LOG_LEVEL
       - LISTEN_HOST=${EZ_PIPE_HOST}
       - PORT=${EZ_WORKER_PORT_A}
+      - SERVICE_NAME=AUTH
       - SESSION_TIMEOUT_S
     restart: "unless-stopped"
     volumes:
