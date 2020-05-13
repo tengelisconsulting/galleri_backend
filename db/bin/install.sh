@@ -14,10 +14,6 @@ execute_all_sql_at_root() {
 
 }
 
-c() {
-    psql -h ${PGHOST} -U ${PGUSER} -f "${DEF_BASE_DIR}/${1}"
-}
-
 
 execute_all_sql_at_root ${DEF_BASE_DIR}/internal/extensions
 execute_all_sql_at_root ${DEF_BASE_DIR}/internal/schemas

@@ -2,9 +2,41 @@ FROM openresty/openresty:buster-fat
 
 WORKDIR /app
 
+RUN apt update \
+        && apt install --assume-yes \
+        build-essential \
+        unzip \
+        wget \
+        libzmq3-dev
+
+        # luarocks
+RUN wget http://luarocks.org/releases/luarocks-2.0.13.tar.gz \
+        && tar -xzvf luarocks-2.0.13.tar.gz \
+        && cd luarocks-2.0.13/ \
+        && ./configure --prefix=/usr/local/openresty/luajit \
+        --with-lua=/usr/local/openresty/luajit/ \
+        --lua-suffix=jit \
+        --with-lua-include=/usr/local/openresty/luajit/include/luajit-2.1
+RUN cd luarocks-2.0.13 \
+        && make \
+        && make install
+RUN /usr/local/openresty/luajit/bin/luarocks install lzmq
+
+        # opm
 RUN opm get ledgetech/lua-resty-http \
         p0pr0ck5/lua-resty-cookie \
-        openresty/lua-resty-redis
+        openresty/lua-resty-redis \
+        fffonion/lua-resty-openssl
+
+RUN apt remove --assume-yes \
+        build-essential \
+        wget \
+        unzip \
+        && apt clean \
+        && rm -rf /var/lib/apt/lists/*
+
+        # ad hoc
+RUN curl https://raw.githubusercontent.com/tengelisconsulting/ez_arch/61e7fe2567a61692495a53ec0bdf1263306b58f2/client/ez_client.lua -o ez_client.lua
 
 VOLUME /app/logs
 
@@ -13,4 +45,8 @@ COPY ./entrypoint.sh ./entrypoint.sh
 COPY ./nginx ./nginx
 COPY ./lua ./lua
 
-ENTRYPOINT [ "/app/entrypoint.sh" ]
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
+ENTRYPOINT [ "/tini", "/app/entrypoint.sh" ]

@@ -1,35 +1,26 @@
-from datetime import datetime
-from datetime import timedelta
 import logging
+import time
 from typing import Dict
 
 import jwt
 
-from galleri.env import get_env
+from env import ENV
 
 
-env = get_env()
 PRIV_KEY_FILE = "/app/priv_key"
 
-_token_sig = None
+_token_sig: str
 with open(PRIV_KEY_FILE, "r") as f:
     _token_sig = f.read()
-def _get_token_sig()-> str:
-    return _token_sig
-
-
-def _get_algo()-> str:
-    return "HS256"
+_ALGO = "HS256"
 
 
 def create_token(
         user_id: str,
-        is_refresh: bool,
+        is_refresh: bool = False,
         session_timeout_s: int = ENV.SESSION_TIMEOUT_S
 )-> str:
-    exp_time = (
-        datetime.now() + timedelta(seconds=session_timeout_s)
-    ).timestamp()
+    exp_time = time.time() + session_timeout_s
     token_byes = jwt.encode(
         {
             "exp": exp_time,
@@ -37,20 +28,20 @@ def create_token(
             "user_id": user_id,
             "is_refresh": is_refresh,
         },
-        _get_token_sig(),
-        algorithm=_get_algo()
+        _token_sig,
+        algorithm = _ALGO
     )
     return token_byes.decode("utf-8")
 
 
 def get_claims(
         token: str,
-        is_refresh: bool
+        is_refresh: bool = False
 )-> Dict:
     claims = jwt.decode(
         token,
-        _get_token_sig(),
-        algorithms=[_get_algo()]
+        _token_sig,
+        algorithms=[_ALGO]
     )
     if claims["is_refresh"] != is_refresh:
         raise Exception("bad token type")

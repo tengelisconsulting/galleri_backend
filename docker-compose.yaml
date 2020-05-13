@@ -1,10 +1,54 @@
 version: "3.4"
 services:
+  # pipes
+  in_pipe:
+    image: tengelisconsulting/pipes_py
+    network_mode: "host"
+    restart: "unless-stopped"
+    environment:
+      - LOG_LEVEL
+      - IN_PORT=${EZ_INPUT_PORT_A}
+      - DEALER_PORT=${EZ_INPUT_PORT_B}
+  worker_pipe:
+    image: tengelisconsulting/pipes_py
+    network_mode: "host"
+    restart: "unless-stopped"
+    environment:
+      - LOG_LEVEL
+      - IN_PORT=${EZ_WORKER_PORT_A}
+      - DEALER_PORT=${EZ_WORKER_PORT_B}
+  broker_pipe:
+    image: tengelisconsulting/pipes_py
+    network_mode: "host"
+    restart: "unless-stopped"
+    environment:
+      - LOG_LEVEL
+      - IN_PORT=${EZ_BROKER_PORT_A}
+      - BROADCAST_PORT=${EZ_BROKER_BROADCAST_PORT}
+
+  broker:
+    image: tengelisconsulting/broker_py
+    network_mode: "host"
+    restart: "unless-stopped"
+    environment:
+      - BROKER_BROADCAST_PORT=${EZ_BROKER_BROADCAST_PORT}
+      - BROKER_PIPE_HOST=${EZ_PIPE_HOST}
+      - BROKER_PIPE_IN_PORT=${EZ_BROKER_PORT_A}
+      - IN_PIPE_HOST=${EZ_PIPE_HOST}
+      - IN_PIPE_PORT=${EZ_INPUT_PORT_B}
+      - LOG_LEVEL
+      - WORKER_PIPE_HOST=${EZ_PIPE_HOST}
+      - WORKER_PIPE_PORT=${EZ_WORKER_PORT_B}
+
+
 
   gateway:
     image: galleri/gateway:${GATEWAY_VSN}
     network_mode: "host"
     environment:
+      - EZ_INPUT_HOST=${EZ_PIPE_HOST}
+      - EZ_INPUT_PORT=${EZ_INPUT_PORT_A}
+
       - GATEWAY_PORT
       - PUB_PGST_HOST
       - PUB_PGST_PORT
@@ -17,44 +61,40 @@ services:
       - OBJ_MAX_SIZE
       - OBJ_STORAGE_HOST
       - OBJ_STORAGE_BUCKET
-      - REDIS_HOST
-      - REDIS_PORT
     restart: unless-stopped
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
 
-  mg2:
-    image: galleri/mg2:${MG2_VSN}
-    network_mode: "host"
-    environment:
-      - PORT=${HTTP_ZMQ_HTTP_PORT}
-      - SEND_PORT=${HTTP_ZMQ_WORK_PORT}
-      - RECV_PORT=${HTTP_ZMQ_RESP_PORT}
-    restart: unless-stopped
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
+  # mg2:
+  #   image: galleri/mg2:${MG2_VSN}
+  #   network_mode: "host"
+  #   environment:
+  #     - PORT=${HTTP_ZMQ_HTTP_PORT}
+  #     - SEND_PORT=${HTTP_ZMQ_WORK_PORT}
+  #     - RECV_PORT=${HTTP_ZMQ_RESP_PORT}
+  #   restart: unless-stopped
+  #   volumes:
+  #     - "/etc/localtime:/etc/localtime:ro"
 
-  mg2_handler:
-    image: galleri/mg2_handler:${MG2_HANDLER_VSN}
-    network_mode: "host"
-    environment:
-      - AWS_GET_URL_LIFETIME_S
-      - MG2_HANDLER_HOST
-      - MG_HOST=${HTTP_ZMQ_HOST}
-      - MG_WORK_PORT=${HTTP_ZMQ_WORK_PORT}
-      - MG_RESP_PORT=${HTTP_ZMQ_RESP_PORT}
-      - SESSION_TIMEOUT_S
-      - LOG_LEVEL
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_KEY
-      - REDIS_HOST
-      - REDIS_PORT
-      - OBJ_STORAGE_BUCKET
-      - OBJ_STORAGE_REGION
-    restart: unless-stopped
-    volumes:
-      - ${PRIV_KEY_FILE}:/app/priv_key:ro
-      - "/etc/localtime:/etc/localtime:ro"
+  # mg2_handler:
+  #   image: galleri/mg2_handler:${MG2_HANDLER_VSN}
+  #   network_mode: "host"
+  #   environment:
+  #     - AWS_GET_URL_LIFETIME_S
+  #     - MG2_HANDLER_HOST
+  #     - MG_HOST=${HTTP_ZMQ_HOST}
+  #     - MG_WORK_PORT=${HTTP_ZMQ_WORK_PORT}
+  #     - MG_RESP_PORT=${HTTP_ZMQ_RESP_PORT}
+  #     - SESSION_TIMEOUT_S
+  #     - LOG_LEVEL
+  #     - AWS_ACCESS_KEY_ID
+  #     - AWS_SECRET_KEY
+  #     - OBJ_STORAGE_BUCKET
+  #     - OBJ_STORAGE_REGION
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ${PRIV_KEY_FILE}:/app/priv_key:ro
+  #     - "/etc/localtime:/etc/localtime:ro"
 
   pub_postgrest:
     image: tengelisconsulting/postgrest:latest
@@ -94,4 +134,17 @@ services:
       - PGDB
     restart: unless-stopped
     volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+
+  auth_worker:
+    image: tengelisconsulting/auth_worker:latest
+    network_mode: "host"
+    environment:
+      - LOG_LEVEL
+      - LISTEN_HOST=${EZ_PIPE_HOST}
+      - PORT=${EZ_WORKER_PORT_A}
+      - SESSION_TIMEOUT_S
+    restart: "unless-stopped"
+    volumes:
+      - ${PRIV_KEY_FILE}:/app/priv_key:ro
       - "/etc/localtime:/etc/localtime:ro"
