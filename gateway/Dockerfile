@@ -1,5 +1,6 @@
 FROM openresty/openresty:buster-fat
 
+ENV TINI_VERSION v0.19.0
 WORKDIR /app
 
 RUN apt update \
@@ -28,16 +29,15 @@ RUN opm get ledgetech/lua-resty-http \
         openresty/lua-resty-redis \
         fffonion/lua-resty-openssl
 
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
 RUN apt remove --assume-yes \
         build-essential \
         wget \
         unzip \
         && apt clean \
         && rm -rf /var/lib/apt/lists/*
-
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
 
         # ad hoc
 RUN curl https://raw.githubusercontent.com/tengelisconsulting/ez_arch/61e7fe2567a61692495a53ec0bdf1263306b58f2/client/ez_client.lua -o ez_client.lua

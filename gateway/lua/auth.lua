@@ -19,7 +19,7 @@ local function get_token(user_id, is_refresh)
       end
       return "/token/new/session"
    end
-   local token_res, err = ez.r("TOKEN", get_path(), {user_id = user_id})
+   local token_res, err = ez.r("SESSION", get_path(), {user_id = user_id})
    if err then
       return nil, err
    end
@@ -125,7 +125,7 @@ local function renew_session()
       })
       ngx.say(res)
    end
-   local session_res, err = ez.r("TOKEN", "/token/parse", {
+   local session_res, err = ez.r("SESSION", "/token/parse", {
                                     token = refresh_token,
                                     is_refresh = true,
    })
@@ -163,7 +163,7 @@ local function authenticate_req()
       return
    end
    -- get user id from token
-   local session_res, err = ez.r("TOKEN", "/token/parse", {
+   local session_res, err = ez.r("SESSION", "/token/parse", {
                                     token = token,
                                     is_refresh = false
    })

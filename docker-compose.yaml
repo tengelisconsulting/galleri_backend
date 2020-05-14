@@ -105,12 +105,12 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
 
-  token_worker:
-    image: galleri/token_worker:latest
+  session_worker:
+    image: galleri/session_worker:latest
     network_mode: "host"
     environment:
       # generic
-      - SERVICE_NAME=TOKEN
+      - SERVICE_NAME=SESSION
       - LOG_LEVEL
       - LISTEN_HOST=${EZ_PIPE_HOST}
       - PORT=${EZ_WORKER_PORT_A}
