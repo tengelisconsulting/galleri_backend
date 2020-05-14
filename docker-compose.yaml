@@ -43,7 +43,7 @@ services:
 
 
   gateway:
-    image: galleri/gateway:${GATEWAY_VSN}
+    image: galleri/gateway:latest
     network_mode: "host"
     environment:
       - EZ_INPUT_HOST=${EZ_PIPE_HOST}
@@ -105,12 +105,12 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
 
-  auth_worker:
+  token_worker:
     image: galleri/auth_worker:latest
     network_mode: "host"
     environment:
       # generic
-      - SERVICE_NAME=AUTH
+      - SERVICE_NAME=TOKEN
       - LOG_LEVEL
       - LISTEN_HOST=${EZ_PIPE_HOST}
       - PORT=${EZ_WORKER_PORT_A}

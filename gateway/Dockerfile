@@ -35,6 +35,10 @@ RUN apt remove --assume-yes \
         && apt clean \
         && rm -rf /var/lib/apt/lists/*
 
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
         # ad hoc
 RUN curl https://raw.githubusercontent.com/tengelisconsulting/ez_arch/61e7fe2567a61692495a53ec0bdf1263306b58f2/client/ez_client.lua -o ez_client.lua
 
@@ -45,8 +49,6 @@ COPY ./entrypoint.sh ./entrypoint.sh
 COPY ./nginx ./nginx
 COPY ./lua ./lua
 
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
+
 
 ENTRYPOINT [ "/tini", "/app/entrypoint.sh" ]
