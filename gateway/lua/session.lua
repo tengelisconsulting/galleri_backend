@@ -7,9 +7,16 @@ local ez = require "lua/ez"
 local log = require "lua/log"
 
 local REFRESH_TOKEN_NAME = "galleri_refresh_token"
+local TOKEN_CAPTURE = "Bearer: (.*)"
 
 
 -- private
+local function authenticate_fail(err_msg)
+   local status = 401
+   local msg = "request authorizaation failed - " .. err_msg
+   respond.die(401, msg)
+end
+
 local function get_token(user_id, is_refresh)
    local function get_path()
       if is_refresh then
@@ -137,7 +144,35 @@ local function renew_session()
    return respond_new_session(claims.user_id)
 end
 
+local function authenticate_req()
+   local auth_header = ngx.var.http_authorization
+   if not auth_header then
+      authenticate_fail("no auth header")
+      return
+   end
+   local _, _, token = string.find(auth_header, TOKEN_CAPTURE)
+   if not token then
+      authenticate_fail("bad auth header")
+      return
+   end
+   -- get user id from token
+   local session_res, err = ez.r("SESSION", "/token/parse", {
+                                    token = token,
+                                    is_refresh = false
+   })
+   if err then
+      authenticate_fail("token verification failed")
+      return
+   end
+   local user_id = session_res.claims.user_id
+   ngx.var.user_id = user_id
+   ngx.req.set_header("user-id", user_id)
+   return user_id
+end
+
+
 local M = {}
+M.authenticate_req = authenticate_req
 M.authenticate_username_password = authenticate_username_password
 M.end_session = end_session
 M.init_user = init_user
