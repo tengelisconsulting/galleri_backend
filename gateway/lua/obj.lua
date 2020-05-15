@@ -9,7 +9,6 @@ local respond = require "lua/respond"
 local function get_access_url(obj_id, access_op)
    local path = string.format("/access/%s", access_op)
    local res, err = ez.r("AWS", path, {obj_id = obj_id})
-   log.info("got res: %s", res)
    if err then
       respond.die(401, "AWS url gneeration failed")
    end
