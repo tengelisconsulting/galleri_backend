@@ -1,6 +1,5 @@
 CREATE OR REPLACE VIEW sys.obj_permissions
 AS
-
      SELECT user_id owner_id,
             image_id obj_id,
             permissions
