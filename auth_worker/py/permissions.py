@@ -12,7 +12,11 @@ import hashing
 
 
 PERMITTED_READ_NO_OBJ = False
-PERMITTED_WRITE_NO_OBJ = False
+PERMITTED_WRITE_NO_OBJ = True
+
+permission_load_url = "http://{}:{}/obj_permissions" \
+    .format(ENV.SYS_PGST_HOST, ENV.SYS_PGST_PORT)
+
 
 class ObjPermission(NamedTuple):
     owner_id: str
@@ -22,18 +26,17 @@ class ObjPermission(NamedTuple):
 
 # init
 _permissions: Dict[str, ObjPermission]
+def to_obj_permission(row)-> ObjPermission:
+    owner = row["permissions"]["owner"]
+    public = row["permissions"]["public"]
+    return ObjPermission(
+        owner_id = row["owner_id"],
+        public_read = "r" in public and public["r"] == "t",
+        public_write = "w" in public and public["w"] == "t",
+    )
 def load_permissions()-> None:
     global _permissions
-    def to_obj_permission(row)-> ObjPermission:
-        owner = row["permissions"]["owner"]
-        public = row["permissions"]["public"]
-        return ObjPermission(
-            owner_id = row["owner_id"],
-            public_read = "r" in public and public["r"] == "t",
-            public_write = "w" in public and public["w"] == "t",
-        )
-    permission_load_url = "http://{}:{}/obj_permissions" \
-        .format(ENV.SYS_PGST_HOST, ENV.SYS_PGST_PORT)
+
     _permissions = {}
     with requests.Session() as s:
         res = s.get(permission_load_url)
@@ -58,11 +61,23 @@ def _verify_claims(
     return True
 
 
+def load_permission(obj_id: str)-> None:
+    with requests.Session() as s:
+        res = s.get(permission_load_url + f"?obj_id=eq.{obj_id}")
+        data = res.json()
+        if not data:
+            return
+        _permissions[obj_id] = to_obj_permission(data[0])
+    return
+
+
 # public
 def check_read_for_user_id(
         obj_id: str,
         user_id: str
 )-> bool:
+    if obj_id not in _permissions:
+        load_permission(obj_id)
     if obj_id not in _permissions:
         return PERMITTED_READ_NO_OBJ
     p = _permissions[obj_id]
@@ -76,7 +91,9 @@ def check_write_for_user_id(
         user_id: str
 )-> bool:
     if obj_id not in _permissions:
-        return PERMITTED_READ_NO_OBJ # can write to a non-existent object
+        load_permission(obj_id)
+    if obj_id not in _permissions:
+        return PERMITTED_WRITE_NO_OBJ
     p = _permissions[obj_id]
     if p.public_write:
         return True
@@ -90,12 +107,14 @@ def check_read_for_claims(
 )-> bool:
     if not claims:
         return False
-    if obj_id not in _permissions:
-        return PERMITTED_READ_NO_OBJ
     if not _verify_claims(obj_id, claims):
         return False
     if not c.READ in claims.ops:
         return False
+    if obj_id not in _permissions:
+        load_permission(obj_id)
+    if obj_id not in _permissions:
+        return PERMITTED_READ_NO_OBJ
     correct_hash = hashing.calc_hash_b64(claims)
     return claims_hash_b64 == correct_hash
 
@@ -107,11 +126,13 @@ def check_write_for_claims(
 )-> bool:
     if not claims:
         return False
-    if obj_id not in _permissions:
-        return PERMITTED_WRITE_NO_OBJ
     if not _verify_claims(obj_id, claims):
         return False
     if not c.WRITE in claims.ops:
         return False
+    if obj_id not in _permissions:
+        load_permission(obj_id)
+    if obj_id not in _permissions:
+        return PERMITTED_WRITE_NO_OBJ
     correct_hash = hashing.calc_hash_b64(claims)
     return claims_hash_b64 == correct_hash

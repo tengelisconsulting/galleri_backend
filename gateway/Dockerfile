@@ -31,7 +31,6 @@ RUN opm get ledgetech/lua-resty-http \
 
 RUN curl -L https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini -o /tini \
         && chmod +x /tini
-# RUN chmod +x /tini
 
 RUN apt remove --assume-yes \
         build-essential \

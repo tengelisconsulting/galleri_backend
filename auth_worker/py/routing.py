@@ -24,7 +24,6 @@ def generate_access_token(
     return [b"OK", {"token": hash_b64}]
 
 
-
 def verify(
         obj_id: str,
         op: str,
@@ -54,7 +53,29 @@ def verify(
     return [b"OK", True]
 
 
+def verify_user_id(
+        obj_id: str,
+        op: str,
+        user_id: str
+):
+    is_valid = False
+    if op == c.READ:
+        is_valid = p.check_read_for_user_id(obj_id, user_id)
+    elif op == c.WRITE:
+        is_valid = p.check_write_for_user_id(obj_id, user_id)
+    else:
+        logging.error("not an op: %s", op)
+        return [b"ERR", "400"]
+    logging.info("user %s %s access to %s  - %s",
+                 user_id, op, obj_id, is_valid)
+    if is_valid:
+        return [b"OK", True]
+    return [b"ERR", "401"]
+
+
+
+
 ROUTES = {
     b"/generate-access-token": generate_access_token,
-    b"/verify": verify,
+    b"/verify/user-id": verify_user_id,
 }
