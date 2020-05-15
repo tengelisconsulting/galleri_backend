@@ -29,8 +29,9 @@ RUN opm get ledgetech/lua-resty-http \
         openresty/lua-resty-redis \
         fffonion/lua-resty-openssl
 
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
+RUN curl -L https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini -o /tini \
+        && chmod +x /tini
+# RUN chmod +x /tini
 
 RUN apt remove --assume-yes \
         build-essential \
@@ -40,7 +41,7 @@ RUN apt remove --assume-yes \
         && rm -rf /var/lib/apt/lists/*
 
         # ad hoc
-RUN curl https://raw.githubusercontent.com/tengelisconsulting/ez_arch/61e7fe2567a61692495a53ec0bdf1263306b58f2/client/ez_client.lua -o ez_client.lua
+RUN curl -L https://raw.githubusercontent.com/tengelisconsulting/ez_arch/61e7fe2567a61692495a53ec0bdf1263306b58f2/client/ez_client.lua -o ez_client.lua
 
 VOLUME /app/logs
 
