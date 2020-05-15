@@ -5,16 +5,12 @@ base_dir=${dev_dir}/..
 dcp_file=${dev_dir}/../../docker-compose.yaml
 
 
-function cleanup() {
-    docker stop backend_gateway_dev
-    docker rm backend_gateway_dev
-}
+# function cleanup() {
+#     docker-compose -f ${dcp_file} stop gateway
+# }
 
-trap cleanup SIGINT
+# trap cleanup SIGINT
 
-LUA_CODE_CACHE="off" docker-compose -f ${dcp_file} run -d --rm \
+LUA_CODE_CACHE="off" docker-compose -f ${dcp_file} run --rm \
               -v ${base_dir}/lua:/app/lua \
-              --name backend_gateway_dev \
               gateway
-
-docker logs -f backend_gateway_dev
