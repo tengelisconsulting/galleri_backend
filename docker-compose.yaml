@@ -105,20 +105,23 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
 
-  session_worker:
-    image: galleri/session_worker:latest
+
+      # workers
+  auth_worker:
+    image: galleri/auth_worker:latest
     network_mode: "host"
     environment:
       # generic
-      - SERVICE_NAME=SESSION
+      - SERVICE_NAME=AUTH
       - LOG_LEVEL
       - LISTEN_HOST=${EZ_PIPE_HOST}
       - PORT=${EZ_WORKER_PORT_A}
-      # impl
-      - SESSION_TIMEOUT_S
+      # specific
+      - ACCEESS_TOKEN_SECRET
+      - SYS_PGST_HOST
+      - SYS_PGST_PORT
     restart: "unless-stopped"
     volumes:
-      - ${PRIV_KEY_FILE}:/app/priv_key:ro
       - "/etc/localtime:/etc/localtime:ro"
 
   aws_worker:
@@ -138,4 +141,20 @@ services:
       - OBJ_STORAGE_REGION
     restart: "unless-stopped"
     volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+
+  session_worker:
+    image: galleri/session_worker:latest
+    network_mode: "host"
+    environment:
+      # generic
+      - SERVICE_NAME=SESSION
+      - LOG_LEVEL
+      - LISTEN_HOST=${EZ_PIPE_HOST}
+      - PORT=${EZ_WORKER_PORT_A}
+      # impl
+      - SESSION_TIMEOUT_S
+    restart: "unless-stopped"
+    volumes:
+      - ${PRIV_KEY_FILE}:/app/priv_key:ro
       - "/etc/localtime:/etc/localtime:ro"

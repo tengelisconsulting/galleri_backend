@@ -17,6 +17,7 @@ do_build() {
 do_build gateway gateway
 do_build auth_worker auth_worker
 do_build aws_worker aws_worker
+do_build session_worker session_worker
 
 # to make dockerhub happy
 docker build -t tengelisconsulting/galleri_backend:latest .
