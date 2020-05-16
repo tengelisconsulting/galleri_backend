@@ -64,6 +64,8 @@ def _verify_claims(
 def load_permission(obj_id: str)-> None:
     with requests.Session() as s:
         res = s.get(permission_load_url + f"?obj_id=eq.{obj_id}")
+        if not res.ok:
+            return
         data = res.json()
         if not data:
             return

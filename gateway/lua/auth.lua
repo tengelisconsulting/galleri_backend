@@ -35,6 +35,51 @@ local function authorize_obj_access(user_id, obj_id, access_op)
    end
 end
 
+
+local function authorize_anon_obj_access(
+      obj_id, access_op, exp_ts, ops, claims_hash)
+   if not (type(ops) == "table") then
+      ops = {ops}
+   end
+   local claims = {
+      obj_id = obj_id,
+      exp_ts = exp_ts,
+      ops = ops,
+   }
+   local res, err = ez.r("AUTH", "/verify/anon", {
+                            obj_id = obj_id,
+                            op = get_access_code(access_op),
+                            claims = claims,
+                            claims_hash_b64 = claims_hash,
+   })
+   if err then
+      authorize_fail(string.format("claims %s failed to authorize",
+                                   log.table_print(claims)))
+      return
+   end
+end
+
+
+local function get_read_access_hash(
+      obj_id, exp_ts)
+   local res, err = ez.r("AUTH", "/read-access-hash", {
+                            obj_id = obj_id,
+                            exp_ts = exp_ts
+   })
+   if err then
+      respond.die(tonumber(err), "failed to issue hash")
+   end
+   log.info("res; %s", log.table_print(res))
+   respond.success({
+         obj_id = obj_id,
+         exp_ts = exp_ts,
+         hash_b64 = res.hash_b64
+   })
+end
+
+
 local M = {}
+M.authorize_anon_obj_access = authorize_anon_obj_access
 M.authorize_obj_access = authorize_obj_access
+M.get_read_access_hash = get_read_access_hash
 return M

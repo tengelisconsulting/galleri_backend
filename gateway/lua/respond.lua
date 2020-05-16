@@ -11,9 +11,7 @@ end
 
 local function success(msg)
    ngx.status = 200
-   ngx.say(cjson.encode({
-                 success = msg,
-   }))
+   ngx.say(cjson.encode(msg))
    ngx.exit(200)
 end
 
