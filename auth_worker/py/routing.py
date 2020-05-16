@@ -29,7 +29,6 @@ def verify_anon(
         claims: Dict,
         claims_hash_b64: str
 ):
-    logging.info("claims: %s", claims)
     if op == c.READ:
         is_valid = p.check_read_for_claims(
             obj_id, c.Claims(**claims), claims_hash_b64
@@ -43,7 +42,6 @@ def verify_anon(
         return [b"ERR", b"400"]
     if not is_valid:
         return [b"ERR", b"401"]
-    logging.info("valid!")
     return [b"OK", True]
 
 
@@ -60,8 +58,6 @@ def verify_user_id(
     else:
         logging.error("not an op: %s", op)
         return [b"ERR", b"400"]
-    logging.info("user %s %s access to %s  - %s",
-                 user_id, op, obj_id, is_valid)
     if is_valid:
         return [b"OK", True]
     return [b"ERR", b"401"]
