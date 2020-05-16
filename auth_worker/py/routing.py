@@ -12,12 +12,13 @@ from hashing import calc_hash_b64
 
 def get_read_access_hash(
         obj_id: str,
-        exp_ts: float
+        exp_ts: float,
+        ops: List[str]
 ):
     claims = c.Claims(
         obj_id = obj_id,
         exp_ts = exp_ts,
-        ops = [c.READ],
+        ops = ops,
     )
     hash_b64 = calc_hash_b64(claims)
     return [b"OK", {"hash_b64": hash_b64}]

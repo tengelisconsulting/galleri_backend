@@ -62,18 +62,24 @@ end
 
 local function get_read_access_hash(
       obj_id, exp_ts)
+   local ops = {"r"}
    local res, err = ez.r("AUTH", "/read-access-hash", {
                             obj_id = obj_id,
-                            exp_ts = exp_ts
+                            exp_ts = exp_ts,
+                            ops = ops,
    })
    if err then
       respond.die(tonumber(err), "failed to issue hash")
    end
-   log.info("res; %s", log.table_print(res))
+   local tmp_url = string.format(
+      "/obj-access-anon/%s/read?exp_ts=%s&ops=r&claims_hash=%s",
+      obj_id, exp_ts, res.hash_b64
+   )
    respond.success({
          obj_id = obj_id,
          exp_ts = exp_ts,
-         hash_b64 = res.hash_b64
+         hash_b64 = res.hash_b64,
+         tmp_url = tmp_url,
    })
 end
 
