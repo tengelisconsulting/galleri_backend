@@ -1,4 +1,5 @@
 import logging
+import re
 import time
 from typing import Dict
 from typing import List
@@ -36,7 +37,6 @@ def to_obj_permission(row)-> ObjPermission:
     )
 def load_permissions()-> None:
     global _permissions
-
     _permissions = {}
     with requests.Session() as s:
         res = s.get(permission_load_url)
@@ -48,12 +48,21 @@ load_permissions()
 
 
 # private
+def _includes_op(permitted_ops: List[c.Op], op: c.Op)-> bool:
+    for permitted_op in permitted_ops:
+        if permitted_op.method != op.method:
+            continue
+        if re.match(permitted_op.url, op.url):
+            return True
+    return False
+
+
 def _verify_claims(
-        obj_id: str,
+        op: c.Op,
         claims: c.Claims
 )-> bool:
-    if not claims.obj_id == obj_id:
-        logging.error("bad obj id in claims")
+    if not _includes_op(claims.ops, op):
+        logging.error("claims don't permit op")
         return False
     if claims.exp_ts < time.time():
         logging.error("claims expired")
@@ -102,39 +111,14 @@ def check_write_for_user_id(
     return p.owner_id == user_id
 
 
-def check_read_for_claims(
-        obj_id: str,
+def check_op_for_claims(
+        op: c.Op,
         claims: c.Claims,
         claims_hash_b64: str
 )-> bool:
     if not claims:
         return False
-    if not _verify_claims(obj_id, claims):
+    if not _verify_claims(op, claims):
         return False
-    if not c.READ in claims.ops:
-        return False
-    if obj_id not in _permissions:
-        load_permission(obj_id)
-    if obj_id not in _permissions:
-        return PERMITTED_READ_NO_OBJ
-    correct_hash = hashing.calc_hash_b64(claims)
-    return claims_hash_b64 == correct_hash
-
-
-def check_write_for_claims(
-        obj_id: str,
-        claims: c.Claims,
-        claims_hash_b64: str
-)-> bool:
-    if not claims:
-        return False
-    if not _verify_claims(obj_id, claims):
-        return False
-    if not c.WRITE in claims.ops:
-        return False
-    if obj_id not in _permissions:
-        load_permission(obj_id)
-    if obj_id not in _permissions:
-        return PERMITTED_WRITE_NO_OBJ
     correct_hash = hashing.calc_hash_b64(claims)
     return claims_hash_b64 == correct_hash

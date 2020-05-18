@@ -8,10 +8,16 @@ local ez = require "lua/ez"
 
 local function do_test()
    app_cors.set_cors_headers()
-   local req_body = cjson.encode({user_id = "xxxx"})
-   local token_res, err = ez.r({"AUTH", "/token/new/refresh", req_body})
-   local token = token_res.token
-   log.info("got token %s", token)
+   local anon_token = ngx.var.http_authorization
+   log.info("anon token: %s", anon_token)
+   local res, err = ez.r("AUTH", "/verify/anon", {
+                            op = {
+                               method = "GET",
+                               url = "/test/hi",
+                            },
+                            claims_token = anon_token,
+   })
+   log.info("--------------------- OK ? %s", res)
    ngx.say(cjson.encode("hey"))
 end
 

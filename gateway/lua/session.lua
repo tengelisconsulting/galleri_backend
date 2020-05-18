@@ -5,9 +5,11 @@ local app_cookie = require "lua/app_cookie"
 local downstream = require "lua/downstream"
 local ez = require "lua/ez"
 local log = require "lua/log"
+local respond = require "lua/respond"
 
 local REFRESH_TOKEN_NAME = "galleri_refresh_token"
 local TOKEN_CAPTURE = "Bearer: (.*)"
+local CLAIMS_CAPTURE = "Claims: (.*)"
 
 
 -- private
@@ -150,24 +152,42 @@ local function authenticate_req()
       authenticate_fail("no auth header")
       return
    end
+   local claims = nil
    local _, _, token = string.find(auth_header, TOKEN_CAPTURE)
    if not token then
-      authenticate_fail("bad auth header")
-      return
+      _, _, claims = string.find(auth_header, CLAIMS_CAPTURE)
+      if not claims then
+         authenticate_fail("bad auth header")
+         return
+      end
    end
-   -- get user id from token
-   local session_res, err = ez.r("SESSION", "/token/parse", {
-                                    token = token,
-                                    is_refresh = false
-   })
-   if err then
-      authenticate_fail("token verification failed")
-      return
+   if claims then
+      local claims_res, err = ez.r("AUTH", "/verify/anon", {
+                                      op = {
+                                         method = ngx.req.get_method(),
+                                         url = ngx.var.request_uri,
+                                      },
+                                      claims_token = claims,
+      })
+      if err then
+         authenticate_fail("claims don't permit request")
+         return
+      end
+   else
+      -- get user id from token
+      local session_res, err = ez.r("SESSION", "/token/parse", {
+                                       token = token,
+                                       is_refresh = false
+      })
+      if err then
+         authenticate_fail("token verification failed")
+         return
+      end
+      local user_id = session_res.claims.user_id
+      ngx.var.user_id = user_id
+      ngx.req.set_header("user-id", user_id)
+      return user_id
    end
-   local user_id = session_res.claims.user_id
-   ngx.var.user_id = user_id
-   ngx.req.set_header("user-id", user_id)
-   return user_id
 end
 
 
