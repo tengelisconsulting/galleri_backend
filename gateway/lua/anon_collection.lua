@@ -7,12 +7,16 @@ local function get_anon_collection_link(
    local ops = {
       { method = "GET",
         url = string.format(
-           [[/db/image_collection_public\?collection_id=eq.%s]],
+           [[/db/image_collection_public\?or=\(and\(collection_id\.eq\.%s]],
            collection_id) },
       { method = "GET",
         url = string.format(
-           [[/db/image_public\?collection_id=eq.%s.*]], collection_id
-      )}
+           [[/db/image_public\?or=\(and\(collection_id\.eq\.%s.*]], collection_id
+      )},
+      {
+         method = "GET",
+         url = "/obj-access/.*/read"
+      },
    }
    local claims = auth.get_access_hash(exp_ts, ops)
    respond.success(claims)
