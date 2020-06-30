@@ -6,4 +6,4 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-ez_worker_main.py
+.mypy_cache
