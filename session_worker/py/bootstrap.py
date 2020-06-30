@@ -6,7 +6,7 @@ import session_token
 
 
 @ez.endpoint(route=b"/token/new/refresh")
-def new_refresh_token(
+async def new_refresh_token(
         user_id: str
 ):
     token = session_token.create_token(user_id, is_refresh=True)
@@ -15,7 +15,7 @@ def new_refresh_token(
 
 
 @ez.endpoint(route=b"/token/new/session")
-def new_session_token(
+async def new_session_token(
         user_id: str
 ):
     token = session_token.create_token(user_id, is_refresh=False)
@@ -24,7 +24,7 @@ def new_session_token(
 
 
 @ez.endpoint(route=b"/token/parse")
-def parse_token(
+async def parse_token(
         token: str,
         is_refresh: bool
 ):

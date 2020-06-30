@@ -12,7 +12,7 @@ from hashing import calc_hash_b64
 
 
 @ez.endpoint(route=b"/access-hash")
-def get_access_hash(
+async def get_access_hash(
         exp_ts: float,
         ops: List[Dict]
 ):
@@ -38,7 +38,7 @@ def get_access_hash(
 
 
 @ez.endpoint(route=b"/verify/anon")
-def verify_anon(
+async def verify_anon(
         op: Dict,
         claims_token: str
 ):
@@ -59,7 +59,7 @@ def verify_anon(
 
 
 @ez.endpoint(route=b"/verify/user-id")
-def verify_user_id(
+async def verify_user_id(
         obj_id: str,
         op: str,
         user_id: str
