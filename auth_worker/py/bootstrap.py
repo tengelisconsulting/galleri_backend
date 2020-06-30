@@ -4,11 +4,14 @@ import logging
 from typing import Dict
 from typing import List
 
+import ez
+
 import const as c
 import permissions as p
 from hashing import calc_hash_b64
 
 
+@ez.endpoint(route=b"/access-hash")
 def get_access_hash(
         exp_ts: float,
         ops: List[Dict]
@@ -34,6 +37,7 @@ def get_access_hash(
     }]
 
 
+@ez.endpoint(route=b"/verify/anon")
 def verify_anon(
         op: Dict,
         claims_token: str
@@ -54,6 +58,7 @@ def verify_anon(
     return [b"OK", True]
 
 
+@ez.endpoint(route=b"/verify/user-id")
 def verify_user_id(
         obj_id: str,
         op: str,
@@ -72,8 +77,5 @@ def verify_user_id(
     return [b"ERR", b"401"]
 
 
-ROUTES = {
-    b"/access-hash": get_access_hash,
-    b"/verify/anon": verify_anon,
-    b"/verify/user-id": verify_user_id,
-}
+async def init() -> None:
+    return
