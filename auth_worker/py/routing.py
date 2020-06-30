@@ -1,11 +1,8 @@
 import base64
 import json
 import logging
-import time
-from typing import cast
 from typing import Dict
 from typing import List
-from typing import Optional
 
 import const as c
 import permissions as p
@@ -18,8 +15,8 @@ def get_access_hash(
 ):
     logging.info("OPS: %s", ops)
     claims = c.Claims(
-        exp_ts = exp_ts,
-        ops = [c.Op(**op) for op in ops],
+        exp_ts=exp_ts,
+        ops=[c.Op(**op) for op in ops],
     )
     hash_b64 = calc_hash_b64(claims)
     response = {
@@ -73,8 +70,6 @@ def verify_user_id(
     if is_valid:
         return [b"OK", True]
     return [b"ERR", b"401"]
-
-
 
 
 ROUTES = {

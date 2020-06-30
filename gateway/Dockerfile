@@ -40,7 +40,7 @@ RUN apt remove --assume-yes \
         && rm -rf /var/lib/apt/lists/*
 
         # ad hoc
-RUN curl -L https://raw.githubusercontent.com/tengelisconsulting/ez_arch/61e7fe2567a61692495a53ec0bdf1263306b58f2/client/ez_client.lua -o ez_client.lua
+COPY ./ez_client.lua ./ez_client.lua
 
 VOLUME /app/logs
 
